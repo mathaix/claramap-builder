@@ -1,0 +1,63 @@
+import json
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
+import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+class InstallTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.skills = Path(self.tmp.name) / 'skills'
+
+    def call(self, name='implement', *extra):
+        return subprocess.run([sys.executable, str(ROOT / 'scripts/install.py'), name,
+                               '--skills-dir', str(self.skills), *extra], text=True, capture_output=True)
+
+    def test_install_includes_references_and_executable_wrapper(self):
+        result = self.call()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        target = self.skills / 'implement'
+        self.assertTrue((target / 'SKILL.md').is_file())
+        self.assertEqual((target / 'LICENSE').read_text(), (ROOT / 'LICENSE').read_text())
+        self.assertTrue((target / 'references/specstory.md').is_file())
+        self.assertTrue((target / 'codex_task.sh').stat().st_mode & 0o111)
+        self.assertFalse((target / '.git').exists())
+        smoke = subprocess.run([sys.executable, str(target / 'scripts/scaffold.py'),
+                                str(Path(self.tmp.name) / 'run'), '--compact'], capture_output=True)
+        self.assertEqual(smoke.returncode, 0)
+
+    def test_replace_backs_up_edits_and_preserves_other_skills(self):
+        self.assertEqual(self.call().returncode, 0)
+        target = self.skills / 'implement/SKILL.md'
+        target.write_text('local changes')
+        other = self.skills / 'another'; other.mkdir(); (other / 'keep').write_text('preserved')
+        refused = self.call()
+        self.assertNotEqual(refused.returncode, 0)
+        self.assertEqual(target.read_text(), 'local changes')
+        replaced = self.call('implement', '--replace')
+        self.assertEqual(replaced.returncode, 0, replaced.stderr)
+        backup = Path(json.loads(replaced.stdout)['backup'])
+        self.assertEqual((backup / 'SKILL.md').read_text(), 'local changes')
+        self.assertNotIn(self.skills, backup.parents)
+        self.assertEqual((other / 'keep').read_text(), 'preserved')
+
+    def test_rejects_traversal_missing_skill_and_symlink_destination(self):
+        self.assertNotEqual(self.call('../implement').returncode, 0)
+        self.assertNotEqual(self.call('does-not-exist').returncode, 0)
+        self.skills.mkdir()
+        outside = Path(self.tmp.name) / 'outside'; outside.mkdir()
+        (outside / 'keep').write_text('untouched')
+        (self.skills / 'implement').symlink_to(outside, target_is_directory=True)
+        self.assertNotEqual(self.call('implement', '--replace').returncode, 0)
+        self.assertEqual((outside / 'keep').read_text(), 'untouched')
+
+    def test_refuses_replacing_collection_source(self):
+        result = subprocess.run([sys.executable, str(ROOT / 'scripts/install.py'), 'implement',
+                                 '--skills-dir', str(ROOT / 'skills'), '--replace'], capture_output=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertTrue((ROOT / 'skills/implement/SKILL.md').is_file())
