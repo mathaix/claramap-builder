@@ -5,19 +5,41 @@ description: "Orchestrate code development in Claude Code: coordinate coding, di
 
 # Implement — code-development orchestrator
 
-This skill guides Claude Code as the orchestrator for a software-development task:
-understand the requested outcome, inspect the repository, implement changes, verify
-behavior, and prepare a reviewed result. You invoke it in the product repository:
+Implement is a skill for using **Claude Code to manage code development from a request
+to a working, verified, and reviewed change**. You describe a feature, bug, or unfinished
+PR. Claude takes responsibility for understanding the existing code, organizing the
+work, getting it implemented, checking the result, and reporting what is ready.
+
+The main Claude session acts as the **orchestrator**. It decides which work to do itself
+and which work to assign to subagents. Coding agents make changes; diagnosis agents
+investigate problems; verification and QA agents check technical behavior and user
+journeys; an independent reviewer examines the integrated result. Claude brings those
+results together, handles findings, and chooses the next useful action. You set the
+outcome and constraints, while the orchestrator manages routine execution decisions.
+
+This workflow is useful when development spans several files, services, or sessions and
+there is coordination work around the coding itself: choosing tests, managing parallel
+changes, following up on review findings, and remembering what has already been checked.
+Its aim is to reduce repeated work and unnecessary handoffs while retaining evidence
+that the requested behavior works. Small changes can stay small; extra agents and
+intermediate reviews are used when they help.
+
+The skill includes instructions **and executable tools**. In the supplied setup, Claude
+launches Codex workers through the bundled wrapper and uses native Claude agents for
+independent review and supported local fallbacks. Other scripts record test results,
+prepare source copies for review, and preserve run state so interrupted work can resume.
+The tables below link to each role, script, and supporting guide.
+
+Implementation reports are kept under `~/.claude/implement/`. Optional SpecStory history
+captures the surrounding conversation. Together, they let you review where time was
+spent, where work got stuck, and which changes to the orchestration workflow would help
+future runs.
+
+Invoke the skill from the product repository with a concrete outcome:
 
 ```text
 /implement Fix the input-save bug, reproduce it locally, and verify the affected journey.
 ```
-
-The main Claude Code session is the coordinator. It can work directly or delegate
-bounded work to agents, integrate their changes, resolve findings, and decide whether
-the evidence is sufficient. The host provides shell, filesystem, Git, and native agent
-capabilities; the scripts bundled here provide recorded worker execution, check evidence,
-review snapshots, and recovery state.
 
 ## Agent roles and how they run
 
