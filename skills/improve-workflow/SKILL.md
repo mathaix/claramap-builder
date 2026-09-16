@@ -150,3 +150,10 @@ On a later review, compare those signals and keep, adjust, or reverse changes ba
 observed results. Preserve quality requirements and owner decisions throughout. The
 skill does not schedule monitoring, launch a new product run, or rewrite itself merely
 because logs are available.
+
+## Installation and companion guides
+
+See [installation](https://github.com/mathaix/skills/blob/main/docs/installation.md)
+and the [improve-workflow guide](https://github.com/mathaix/skills/blob/main/docs/improve-workflow.md)
+for setup and examples. The [implement guide](https://github.com/mathaix/skills/blob/main/docs/implement.md)
+explains the development orchestrator whose records this skill can analyze.

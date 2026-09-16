@@ -12,8 +12,8 @@ Reusable coding-agent skills by [mathaix](https://github.com/mathaix).
 Requires Python 3.11+ and Git. The implement helpers support macOS and Linux; use WSL on Windows.
 
 ```sh
-git clone https://github.com/mathaix/skills.git
-cd skills
+git clone https://github.com/mathaix/skills.git ~/mathaix-skills
+cd ~/mathaix-skills
 python3 scripts/install.py implement
 python3 scripts/install.py improve-workflow
 ```
@@ -22,41 +22,33 @@ Each command installs only the named skill into `~/.claude/skills/<name>/`. You 
 
 **Model access:** implement is a Claude Code workflow with a Codex worker wrapper. Its shipped policy uses Codex `gpt-5.6-luna`, `gpt-5.6-terra`, and `gpt-5.6-sol`, independent Claude Opus review, and a local Sonnet capability fallback. Those model IDs must be available to your account. See [installation and model policy](docs/installation.md) before dispatching workers.
 
-## Use implement
+## Use the skills together
 
-Open Claude Code in the project you want to work on:
+**Implement delivers the code change. Improve-workflow improves how that work gets done.**
 
 ```text
 /implement Fix the input-save bug. Reproduce it locally, implement the fix, and verify the affected flow.
 ```
 
-The coordinator can code directly or assign coding, verification, QA, and diagnosis agents. It selects checks based on risk and reuses valid evidence. One independent final review and repository-required checks remain part of completion.
-
-You can also give a bounded instruction:
+After a run, inspect its implementation records and optional SpecStory history:
 
 ```text
-/implement Address the remaining findings in this PR. Keep the accepted design, reuse valid test results, and report anything still unverified.
+/improve-workflow Review recent runs. Find repeated work and bottlenecks, and recommend improvements without editing yet.
 ```
 
-See [usage](docs/usage.md), [SpecStory workflow](skills/improve-workflow/references/specstory.md), and [installation, updates, and removal](docs/installation.md).
-
-## Improving the workflow
-
-Use the separate skill when you want to inspect or improve how development runs:
-
-```text
-/improve-workflow Review recent implementation reports and SpecStory history. Find repeated work and bottlenecks, and recommend improvements without editing yet.
-```
-
-To apply agreed changes, ask `/improve-workflow` to make and verify them in the skills repository. It uses the same records without automatically altering the development workflow after every run.
-
-I review SpecStory conversations alongside implementation timings, test evidence, and
-review results, then use the findings to improve the skill and its tools. The next run
-provides feedback on whether the changes helped.
+Ask improve-workflow to apply the changes you want. Use the updated skill for later development and compare the results.
 
 ![How SpecStory and implementation evidence improve the workflow](skills/improve-workflow/assets/workflow-feedback.png)
 
-[See the workflow improvement diagram](skills/improve-workflow/references/specstory.md#the-workflow-improvement-loop).
+## Documentation
+
+| Guide | What you will find |
+| --- | --- |
+| [Start here: how the skills connect](docs/usage.md) | Choose a skill and understand the feedback loop |
+| [Installation](docs/installation.md) | Requirements, personal/project setup, model policy, updates, and removal |
+| [Using implement](docs/implement.md) | Requests, orchestrator and subagent roles, executable tools, and completion criteria |
+| [Using improve-workflow](docs/improve-workflow.md) | Audit runs, apply improvements, and measure the next run |
+| [SpecStory and implementation evidence](skills/improve-workflow/references/specstory.md) | Capture history, locate records, and interpret timings |
 
 ## Repository layout
 

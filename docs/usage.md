@@ -1,68 +1,23 @@
-# Using implement
+# Using the skills
 
-Work in your product repository, not in the skills collection. Start Claude Code and invoke:
+[Collection home](../README.md) · [Installation](installation.md)
 
-```text
-/implement Add the requested behavior. Use existing decisions, choose appropriate tests, and verify the result.
-```
+Use **implement** to deliver a code change. Use **improve-workflow** to understand how development ran and improve the process. Each works independently; together they form a feedback loop.
 
-Include the outcome, acceptance conditions, environment constraints, and any authorized external steps. A request to fix code does not automatically authorize deployment or messages to other people.
+| Your task | Start here | Agent instructions |
+| --- | --- | --- |
+| Build a feature, fix a bug, or finish a PR | [Implement guide](implement.md) | [implement/SKILL.md](../skills/implement/SKILL.md) |
+| Find delays, compare runs, or improve orchestration and checks | [Improve-workflow guide](improve-workflow.md) | [improve-workflow/SKILL.md](../skills/improve-workflow/SKILL.md) |
+| Install, update, or remove either skill | [Installation](installation.md) | — |
+| Capture conversations and interpret execution records | [SpecStory and evidence guide](../skills/improve-workflow/references/specstory.md) | — |
 
-## What the coordinator decides
+## How they work together
 
-The coordinator chooses whether to implement directly or use agents, how to group work, which checks to run, and when intermediate review would help. Separate planning review is reserved for unresolved consequential design questions or explicit requirements. Routine changes to test commands, filenames, or task order do not restart planning.
+1. **Implement** coordinates coding, verification, QA, and review in your product repository.
+2. Its implementation folder records attempts, checks, and outcomes. Optional **SpecStory** history adds conversation context.
+3. **Improve-workflow** reads that evidence to explain delays and verification gaps, then recommends changes or applies them when requested.
+4. Use the updated skill on later work. Compare similar runs to see whether the change helped without losing verification coverage.
 
-| Role | Responsibility |
-| --- | --- |
-| Coding | Implement a bounded change and run assigned focused checks. |
-| Verification | Exercise specific failure conditions on a known revision and save evidence. |
-| QA | Check actual user journeys and report expected versus observed behavior. |
-| Diagnosis | Reproduce and investigate an uncertain cause. |
-| Independent review | Review the integrated result, affected callers, and verification coverage. |
+![The feedback loop from implementation to workflow improvement](../skills/improve-workflow/assets/workflow-feedback.png)
 
-These are available capabilities, not five compulsory stages. See the [delegation toolbox](../skills/implement/references/delegation.md).
-
-## Records and tools
-
-By default, personal run artifacts live under `~/.claude/implement/<project>-<task>/`. A compact run starts with `status.md`; recovery files record current state. Detailed plans are added only when useful. Preserve existing runs when resuming.
-
-| Tool | Purpose |
-| --- | --- |
-| `scripts/scaffold.py --compact` | Create a concise new run record. |
-| `codex_task.sh run` / `resume` | Start or resume a Codex worker with saved prompts, attempts, locks, and usage. |
-| `scripts/check_evidence.py run` / `status` | Record a check or verify whether previous evidence is reusable. |
-| `scripts/review_gate.py snapshot --base <commit>` | Capture the entire integrated change for final review. |
-| `scripts/review_copy.py` | Export the reviewed source into an isolated copy. |
-| `scripts/run_state.py` | Record current Git/worker state and the coordinator's planning decision. |
-| `codex_task.sh cost` | Summarize observed worker tokens without inventing billed costs. |
-
-Tool paths above are relative to the installed implement skill. Full commands are in the [execution guide](../skills/implement/references/execution.md) and [verification guide](../skills/implement/references/verification.md). `IMPLEMENT_ROOT` changes the worker wrapper's run root; use that same root for explicit scaffold/check/recovery paths.
-
-## Examples of useful steering
-
-```text
-Use a coding agent for the change and a verification agent for the database behavior. Keep shared database operations serialized.
-```
-
-```text
-Reuse the passing unit-test evidence if its inputs still match. Run QA against the actual local landing journey and report anything not exercised.
-```
-
-```text
-Resume the existing run. Reconcile Git and worker state first. Keep the open findings and avoid rerunning unchanged checks.
-```
-
-## What counts as done
-
-The acceptance criteria are met, repository-required checks pass, and an independent reviewer has approved the integrated content. A worker exit code, an old deployment result, or a mocked test alone cannot prove the whole journey. Changed code requires review of that delta and its consequences; valid prior review coverage remains useful.
-
-A copied review tree has no `.git`, ignored files, or provisioned dependencies. The exporter rejects submodules and escaping symlinks and does not fetch Git LFS content. Prepare a suitable separate environment when a check needs those features; do not mislabel a skipped check as passed.
-
-Use [SpecStory with the implementation reports](../skills/improve-workflow/references/specstory.md) to inspect delays, recover context, and improve future task selection.
-
-## Improve the development workflow
-
-Invoke `/improve-workflow` to analyze the evidence left by runs, identify bottlenecks,
-and propose or apply targeted workflow improvements. See its
-[skill instructions](../skills/improve-workflow/SKILL.md). This is a separate activity
-from implementing the product feature; a request to audit leaves files unchanged.
+This loop is driven by your requests. Completing an implementation does not automatically start an audit or rewrite a skill.

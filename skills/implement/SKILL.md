@@ -203,6 +203,7 @@ Test observable helper behavior, not matching prose.
 
 This skill is published in [mathaix/skills](https://github.com/mathaix/skills), under
 `skills/implement/`. See [installation](https://github.com/mathaix/skills/blob/main/docs/installation.md)
-and [usage](https://github.com/mathaix/skills/blob/main/docs/usage.md). For
+and the [implement guide](https://github.com/mathaix/skills/blob/main/docs/implement.md).
+To analyze runs and improve this workflow, use the [improve-workflow guide](https://github.com/mathaix/skills/blob/main/docs/improve-workflow.md). For
 optional session capture, recovery context, and timing audits, use
 [companion workflow-improvement guide](references/specstory.md). Keep real transcripts local.
