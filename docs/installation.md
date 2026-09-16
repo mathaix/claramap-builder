@@ -6,7 +6,7 @@
 - macOS or Linux; Windows users need WSL because task locks and process cleanup use POSIX facilities.
 - [Claude Code](https://code.claude.com/docs/en/overview), authenticated, for the coordinator and independent Claude agents.
 - An installed, authenticated Codex CLI for delegated Codex workers. Direct coordinator work and helper tests do not launch Codex.
-- SpecStory is optional; see the [capture and review guide](../skills/implement/references/specstory.md).
+- SpecStory is optional; see the [capture and review guide](../skills/improve-workflow/references/specstory.md).
 
 Check the programs you intend to use:
 
@@ -25,6 +25,7 @@ No credentials belong in this repository. Authenticate through each application'
 git clone https://github.com/mathaix/skills.git
 cd skills
 python3 scripts/install.py implement
+python3 scripts/install.py improve-workflow
 ```
 
 The result is `~/.claude/skills/implement/SKILL.md` plus its supporting files. Claude Code discovers personal skills in that directory; invoke this one with `/implement`. See the [official skill documentation](https://code.claude.com/docs/en/skills).
@@ -40,6 +41,16 @@ python3 scripts/install.py implement --skills-dir /absolute/path/to/project/.cla
 ```
 
 This makes the skill part of that project's skill directory. Review before committing the installed files to a project. Pick personal or project installation deliberately to avoid stale duplicate copies.
+
+## Choosing a skill
+
+`implement` executes development work. `improve-workflow` analyzes how that work ran and,
+when requested, improves the relevant skill or tooling. They can be installed separately.
+The improvement skill has no executable-helper or fixed model dependency; it works with
+the available host and evidence. SpecStory and implement-format logs are optional inputs.
+
+Use `/improve-workflow <question or requested change>` in Claude Code after installation.
+Update either skill by passing its name with `--replace` to the installer.
 
 ## Model policy
 

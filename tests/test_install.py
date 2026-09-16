@@ -31,6 +31,16 @@ class InstallTests(unittest.TestCase):
                                 str(Path(self.tmp.name) / 'run'), '--compact'], capture_output=True)
         self.assertEqual(smoke.returncode, 0)
 
+    def test_improvement_skill_installs_independently_with_its_assets(self):
+        result = self.call('improve-workflow')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        target = self.skills / 'improve-workflow'
+        self.assertTrue((target / 'SKILL.md').is_file())
+        self.assertTrue((target / 'references/specstory.md').is_file())
+        self.assertTrue((target / 'assets/workflow-feedback.png').is_file())
+        self.assertEqual((target / 'LICENSE').read_text(), (ROOT / 'LICENSE').read_text())
+        self.assertFalse((self.skills / 'implement').exists())
+
     def test_replace_backs_up_edits_and_preserves_other_skills(self):
         self.assertEqual(self.call().returncode, 0)
         target = self.skills / 'implement/SKILL.md'

@@ -30,10 +30,10 @@ independent review and supported local fallbacks. Other scripts record test resu
 prepare source copies for review, and preserve run state so interrupted work can resume.
 The tables below link to each role, script, and supporting guide.
 
-Implementation reports are kept under `~/.claude/implement/`. Optional SpecStory history
-captures the surrounding conversation. Together, they let you review where time was
-spent, where work got stuck, and which changes to the orchestration workflow would help
-future runs.
+Implementation reports are kept under `~/.claude/implement/`. Use the separate
+[improve-workflow skill](https://github.com/mathaix/skills/tree/main/skills/improve-workflow)
+to review those reports alongside optional SpecStory history and improve how development
+is coordinated. This skill remains responsible for executing the development task.
 
 Invoke the skill from the product repository with a concrete outcome:
 
@@ -205,4 +205,4 @@ This skill is published in [mathaix/skills](https://github.com/mathaix/skills), 
 `skills/implement/`. See [installation](https://github.com/mathaix/skills/blob/main/docs/installation.md)
 and [usage](https://github.com/mathaix/skills/blob/main/docs/usage.md). For
 optional session capture, recovery context, and timing audits, use
-[SpecStory alongside implement](references/specstory.md). Keep real transcripts local.
+[companion workflow-improvement guide](references/specstory.md). Keep real transcripts local.

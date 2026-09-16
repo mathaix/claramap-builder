@@ -58,4 +58,11 @@ The acceptance criteria are met, repository-required checks pass, and an indepen
 
 A copied review tree has no `.git`, ignored files, or provisioned dependencies. The exporter rejects submodules and escaping symlinks and does not fetch Git LFS content. Prepare a suitable separate environment when a check needs those features; do not mislabel a skipped check as passed.
 
-Use [SpecStory with the implementation reports](../skills/implement/references/specstory.md) to inspect delays, recover context, and improve future task selection.
+Use [SpecStory with the implementation reports](../skills/improve-workflow/references/specstory.md) to inspect delays, recover context, and improve future task selection.
+
+## Improve the development workflow
+
+Invoke `/improve-workflow` to analyze the evidence left by runs, identify bottlenecks,
+and propose or apply targeted workflow improvements. See its
+[skill instructions](../skills/improve-workflow/SKILL.md). This is a separate activity
+from implementing the product feature; a request to audit leaves files unchanged.
