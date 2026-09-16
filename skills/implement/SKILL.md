@@ -32,10 +32,15 @@ The tables below link to each role, script, and supporting guide.
 
 Implementation reports are kept under `~/.claude/implement/`. Use the separate
 [improve-workflow skill](https://github.com/mathaix/skills/tree/main/skills/improve-workflow)
-to review those reports alongside optional SpecStory history and improve how development
+to review those reports alongside SpecStory history and improve how development
 is coordinated. This skill remains responsible for executing the development task.
 
-Invoke the skill from the product repository with a concrete outcome:
+This setup assumes SpecStory CLI, Claude Code, and Codex CLI are installed, with Claude
+and Codex authenticated. Start interactive sessions through `specstory run claude --no-cloud-sync`
+or `specstory run codex --no-cloud-sync` from the product worktree. For delegated workers,
+keep SpecStory background capture running as described in the [capture guide](references/specstory.md).
+
+Invoke the skill in the Claude session with a concrete outcome:
 
 ```text
 /implement Fix the input-save bug, reproduce it locally, and verify the affected journey.
@@ -80,7 +85,7 @@ use the linked references for full commands and when to use each tool.
 | [run_state.py](scripts/run_state.py) | Observe Git/worker state, planning policy, completed commits, and next action | [Recovery](references/recovery.md) |
 
 Product changes stay in the product worktree. Operational evidence normally stays in
-`~/.claude/implement/<repo>-<slug>/`. Optional [SpecStory history](references/specstory.md)
+`~/.claude/implement/<repo>-<slug>/`. [SpecStory history](references/specstory.md)
 adds conversation context for recovery and workflow improvement. Read the relevant
 reference when needed; the coordinator does not need to load every reference up front.
 
@@ -205,5 +210,5 @@ This skill is published in [mathaix/skills](https://github.com/mathaix/skills), 
 `skills/implement/`. See [installation](https://github.com/mathaix/skills/blob/main/docs/installation.md)
 and the [implement guide](https://github.com/mathaix/skills/blob/main/docs/implement.md).
 To analyze runs and improve this workflow, use the [improve-workflow guide](https://github.com/mathaix/skills/blob/main/docs/improve-workflow.md). For
-optional session capture, recovery context, and timing audits, use
+session capture, recovery context, and timing audits, use
 [companion workflow-improvement guide](references/specstory.md). Keep real transcripts local.

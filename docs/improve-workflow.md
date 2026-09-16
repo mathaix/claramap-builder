@@ -6,7 +6,7 @@ Improve-workflow examines how code development ran: where time went, which work 
 
 ## Review a run
 
-Open Claude Code in the product repository whose work you want to inspect. Identify the runs or time window and ask a concrete question:
+With [Claude Code, Codex, and SpecStory installed](installation.md#requirements), open Claude Code through `specstory run claude --no-cloud-sync` in the product repository whose work you want to inspect. Identify the runs or time window and ask a concrete question:
 
 ```text
 /improve-workflow Review the last three runs in ~/.claude/implement and this project's
@@ -20,10 +20,10 @@ The skill reads relevant summaries first, then checks attempts, test records, re
 | Source | What it contributes |
 | --- | --- |
 | `~/.claude/implement/<project>-<task>/` | Run status, worker attempts, check evidence, review outcomes, and recovery state from implement |
-| `.specstory/history/` in the product worktree | Optional conversation history: changed requests, handoffs, and waits |
+| `.specstory/history/` in the product worktree | Captured conversation history: changed requests, handoffs, and waits |
 | Relevant source and Git state | The instructions, tools, and revisions behind the reported behavior |
 
-Neither implement nor SpecStory is required; equivalent execution records work too. Keep real reports and transcripts local. See the [SpecStory and evidence guide](../skills/improve-workflow/references/specstory.md) for capture commands, timing limits, and the feedback diagram.
+SpecStory is required by this setup and should capture the Claude and Codex sessions being reviewed. If an older run has no captured history, analyze the available evidence and state that limitation; missing history cannot be reconstructed from summary reports alone. Keep real reports and transcripts local. See the [SpecStory and evidence guide](../skills/improve-workflow/references/specstory.md) for capture commands, timing limits, and the feedback diagram.
 
 ## Apply an improvement
 

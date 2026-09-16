@@ -2,7 +2,13 @@
 
 [All guides](usage.md) · [Installation](installation.md) · [Improve-workflow guide](improve-workflow.md)
 
-Work in your product repository, not in the skills collection. Start Claude Code and invoke:
+Work in your product repository, not in the skills collection. With [Claude Code, Codex, and SpecStory installed](installation.md#requirements), start Claude through SpecStory:
+
+```sh
+specstory run claude --no-cloud-sync
+```
+
+Then invoke:
 
 ```text
 /implement Add the requested behavior. Use existing decisions, choose appropriate tests, and verify the result.

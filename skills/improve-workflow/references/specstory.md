@@ -50,7 +50,7 @@ until the next runs support it; changes to the workflow are deliberate and verif
 
 ## Install and capture
 
-SpecStory is optional. On Homebrew:
+This workflow requires SpecStory CLI and assumes Claude Code and Codex CLI are installed and authenticated. Install SpecStory before starting development sessions. On Homebrew:
 
 ```sh
 brew install specstoryai/tap/specstory
@@ -65,9 +65,10 @@ From your product worktree:
 specstory run claude --no-cloud-sync
 ```
 
-Then enter `/implement <your task>` in Claude Code. The explicit flag keeps this capture
-local. SpecStory writes Markdown under `.specstory/history/`. If you launch agents directly,
-use a separate terminal:
+Then enter `/implement <your task>` or `/improve-workflow <question>` in Claude Code.
+For interactive Codex work, use `specstory run codex --no-cloud-sync`. The explicit flag keeps this capture
+local. SpecStory writes Markdown under `.specstory/history/`. The implement wrapper launches delegated Codex workers directly; keep background capture
+running in a separate terminal in the relevant worktree:
 
 ```sh
 specstory watch --no-cloud-sync

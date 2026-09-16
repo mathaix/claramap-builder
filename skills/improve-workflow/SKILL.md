@@ -15,7 +15,11 @@ The companion [implement skill](https://github.com/mathaix/skills/tree/main/skil
 coordinates product development. Improve-workflow studies the evidence left by that
 work and helps improve the orchestration instructions, agent assignments, helper tools,
 and verification strategy. It can also analyze other workflows with equivalent records;
-it does not require implement or SpecStory to be installed.
+implement itself can be installed separately. This setup requires SpecStory CLI, Claude
+Code, and Codex CLI installed, with Claude and Codex authenticated and their sessions
+captured through SpecStory. See the [capture guide](references/specstory.md) for launch
+and background-capture commands. If historical capture is missing, report that evidence
+gap and analyze what is available.
 
 Start in the relevant product worktree and identify the runs to inspect:
 

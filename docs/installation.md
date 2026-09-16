@@ -4,22 +4,48 @@
 
 ## Requirements
 
-Both skills can be installed independently. The installer requires Python 3.11+ and Git; the examples below use [Claude Code](https://code.claude.com/docs/en/overview).
+This workflow assumes **SpecStory CLI, Claude Code, and Codex CLI are already installed**, with Claude and Codex authenticated. SpecStory is a required part of the documented setup: Claude and Codex sessions run with its capture enabled so improve-workflow can review their conversation history alongside implementation evidence.
 
-**Implement** uses POSIX helpers on macOS or Linux (WSL on Windows), authenticated Claude Code for the coordinator and independent Claude agents, and an authenticated Codex CLI for delegated Codex workers. Direct coordinator work and helper tests do not launch Codex. Check its [model policy](#model-policy) before dispatching workers.
+- Install [Claude Code](https://code.claude.com/docs/en/overview) and Codex CLI, and complete their authentication setup.
+- Install [SpecStory CLI](https://docs.specstory.com/integrations/terminal-coding-agents). On Homebrew: `brew install specstoryai/tap/specstory`.
+- Install Python 3.11+ and Git. Implement's helpers use POSIX facilities on macOS/Linux; use WSL on Windows.
 
-**Improve-workflow** has no executable-helper or fixed model dependency. It works with the available host and evidence. SpecStory and implement-format logs are optional; see the [capture and review guide](../skills/improve-workflow/references/specstory.md).
-
-Check the programs you intend to use:
+Check the setup:
 
 ```sh
 python3 --version
 git --version
 claude --version
 codex --version
+specstory version
+specstory check
 ```
 
-No credentials belong in this repository. Authenticate through each application's normal setup. The installer does not install CLIs, change credentials, or alter tool permissions.
+The skills can be installed separately. Implement uses Claude for orchestration and independent review, and Codex for delegated workers; check its [model policy](#model-policy). Improve-workflow adds no fixed model requirement of its own.
+
+The skill installer only copies skill files. It does not install these programs, authenticate them, or start SpecStory.
+
+## Run Claude and Codex through SpecStory
+
+From the product repository, launch Claude Code through SpecStory:
+
+```sh
+specstory run claude --no-cloud-sync
+```
+
+Enter `/implement <task>` or `/improve-workflow <question>` in that Claude session. For an interactive Codex session, launch it the same way:
+
+```sh
+specstory run codex --no-cloud-sync
+```
+
+These are separate interactive sessions; you do not need to open an extra Codex session for implement's delegated workers. Those workers are launched directly by `codex_task.sh`. Keep background capture running in another terminal in the relevant worktree:
+
+```sh
+specstory watch --no-cloud-sync
+```
+
+SpecStory saves exported conversation history under `.specstory/history/`; `--no-cloud-sync` keeps the exports local. Check that relevant sessions appear there. Worker attempt and check records remain under `~/.claude/implement/`; launching the coordinator through SpecStory alone does not prove every worker was captured. See the [capture guide](../skills/improve-workflow/references/specstory.md) for existing sessions, worktrees, and capture limits, and the [official CLI reference](https://docs.specstory.com/integrations/terminal-coding-agents/usage) for launch options.
 
 ## Personal installation
 

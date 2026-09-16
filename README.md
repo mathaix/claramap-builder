@@ -9,7 +9,9 @@ Reusable coding-agent skills by [mathaix](https://github.com/mathaix).
 
 ## Install a skill
 
-Requires Python 3.11+ and Git. The implement helpers support macOS and Linux; use WSL on Windows.
+**Prerequisites:** install SpecStory CLI, Claude Code, and Codex CLI first, and authenticate Claude and Codex. This workflow assumes both coding agents run with SpecStory capture enabled. The skill installer does not install these programs. See [setup and launch commands](docs/installation.md#requirements).
+
+Also requires Python 3.11+ and Git. The implement helpers support macOS and Linux; use WSL on Windows.
 
 ```sh
 git clone https://github.com/mathaix/skills.git ~/mathaix-skills
@@ -26,11 +28,19 @@ Each command installs only the named skill into `~/.claude/skills/<name>/`. You 
 
 **Implement delivers the code change. Improve-workflow improves how that work gets done.**
 
+Start Claude Code through SpecStory in your product repository:
+
+```sh
+specstory run claude --no-cloud-sync
+```
+
+Then invoke the skill:
+
 ```text
 /implement Fix the input-save bug. Reproduce it locally, implement the fix, and verify the affected flow.
 ```
 
-After a run, inspect its implementation records and optional SpecStory history:
+After a run, inspect its implementation records and SpecStory history:
 
 ```text
 /improve-workflow Review recent runs. Find repeated work and bottlenecks, and recommend improvements without editing yet.
