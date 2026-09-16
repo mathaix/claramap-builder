@@ -38,6 +38,14 @@ You can also give a bounded instruction:
 
 See [usage](docs/usage.md), [SpecStory workflow](skills/implement/references/specstory.md), and [installation, updates, and removal](docs/installation.md).
 
+## Improving the workflow
+
+I review SpecStory conversations alongside implementation timings, test evidence, and
+review results, then use the findings to improve the skill and its tools. The next run
+provides feedback on whether the changes helped.
+
+[See the workflow improvement diagram](skills/implement/references/specstory.md#the-workflow-improvement-loop).
+
 ## Repository layout
 
 ```text

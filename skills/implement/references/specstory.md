@@ -4,6 +4,41 @@ Use two complementary records: implementation reports say what was planned, run,
 and completed; SpecStory captures the conversation that explains decisions and delays.
 Neither replaces current Git state or actual test output.
 
+## The workflow improvement loop
+
+I use SpecStory to understand what happened in the conversation, and the implementation
+folder to check what actually ran, how long it took, and what passed. Reviewing them
+together helps me decide which workflow changes are worth making.
+
+```mermaid
+flowchart TD
+    RUN["Run /implement<br/>Coordinator chooses coding, verification and QA work"]
+    STORY["SpecStory history<br/>.specstory/history/<br/>Conversation, decisions and interruptions"]
+    EVIDENCE["Implementation folder<br/>~/.claude/implement/PROJECT-TASK/<br/>Attempts, timings, checks and review results"]
+    REVIEW["Review both with the coordinator<br/>Cross-check against current Git state and actual results"]
+    FIND["Identify improvements<br/>Repeated checks, slow handoffs, environment failures or missed bugs"]
+    CHANGE["Make targeted workflow changes<br/>Skill instructions, agent assignments and helper tools"]
+    VERIFY["Verify the changes<br/>Relevant tests and realistic workflow scenarios"]
+    APPLY["Push and install the updated skill<br/>Coordinator rereads it for the next run"]
+    RUN --> STORY
+    RUN --> EVIDENCE
+    STORY --> REVIEW
+    EVIDENCE --> REVIEW
+    REVIEW --> FIND
+    FIND --> CHANGE
+    CHANGE --> VERIFY
+    VERIFY --> APPLY
+    APPLY --> RUN
+```
+
+For example, repeated test runs across coding, verification, and review agents led to
+assigning each check one executor and adding reusable check evidence. Repeated planning
+approvals led to giving the coordinator discretion over routine task and test changes.
+
+On subsequent comparable runs, I check whether those changes reduced time and repeated
+work while preserving useful checks and catching defects. An improvement is a hypothesis
+until the next runs support it; changes to the workflow are deliberate and verified.
+
 ## Install and capture
 
 SpecStory is optional. On Homebrew:
