@@ -44,6 +44,8 @@ I review SpecStory conversations alongside implementation timings, test evidence
 review results, then use the findings to improve the skill and its tools. The next run
 provides feedback on whether the changes helped.
 
+![How SpecStory and implementation evidence improve the workflow](skills/implement/assets/workflow-feedback.png)
+
 [See the workflow improvement diagram](skills/implement/references/specstory.md#the-workflow-improvement-loop).
 
 ## Repository layout

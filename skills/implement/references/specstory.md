@@ -10,6 +10,11 @@ I use SpecStory to understand what happened in the conversation, and the impleme
 folder to check what actually ran, how long it took, and what passed. Reviewing them
 together helps me decide which workflow changes are worth making.
 
+![Feedback loop from implementation and SpecStory evidence to reviewed, tested workflow improvements.](../assets/workflow-feedback.png)
+
+<details>
+<summary>Editable Mermaid diagram</summary>
+
 ```mermaid
 flowchart TD
     RUN["Run /implement<br/>Coordinator chooses coding, verification and QA work"]
@@ -30,6 +35,8 @@ flowchart TD
     VERIFY --> APPLY
     APPLY --> RUN
 ```
+
+</details>
 
 For example, repeated test runs across coding, verification, and review agents led to
 assigning each check one executor and adding reusable check evidence. Repeated planning

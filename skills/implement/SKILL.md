@@ -1,9 +1,68 @@
 ---
 name: implement
-description: Complete a feature, fix, or existing PR with coordinator-selected coding, verification, QA, and independent review. Use for /implement and requests to plan or carry out implementation work.
+description: "Orchestrate code development in Claude Code: coordinate coding, diagnosis, verification, QA, and independent review agents to complete a feature, fix, or PR. Use for /implement and requests to plan or carry out implementation work."
 ---
 
-# Implement
+# Implement — code-development orchestrator
+
+This skill guides Claude Code as the orchestrator for a software-development task:
+understand the requested outcome, inspect the repository, implement changes, verify
+behavior, and prepare a reviewed result. You invoke it in the product repository:
+
+```text
+/implement Fix the input-save bug, reproduce it locally, and verify the affected journey.
+```
+
+The main Claude Code session is the coordinator. It can work directly or delegate
+bounded work to agents, integrate their changes, resolve findings, and decide whether
+the evidence is sufficient. The host provides shell, filesystem, Git, and native agent
+capabilities; the scripts bundled here provide recorded worker execution, check evidence,
+review snapshots, and recovery state.
+
+## Agent roles and how they run
+
+| Role | What the coordinator delegates | Execution |
+| --- | --- | --- |
+| Coding | Implement a scoped change and run its focused checks | Codex worker or a capable native agent, following the model policy |
+| Diagnosis | Reproduce a bug, inspect callers, and establish its cause | A bounded investigation agent with source and reproduction access |
+| Verification | Test specific failure conditions on a known revision; retain reusable results | A worker assigned checks in an isolated copy or authorized environment |
+| QA | Exercise the actual user journey and report expected versus observed behavior | A capable agent using the project's local services, browser, or integration tools |
+| Independent review | Review the integrated diff, affected behavior, and evidence | A separate Claude Opus agent through the host's native agent interface |
+
+These roles are assigned in a brief; they are not five compulsory stages or five separate
+installed agent packages. The coordinator chooses the useful roles for each task.
+[Delegation and example dispatch commands](references/delegation.md) explain isolation,
+write boundaries, inputs, and expected results; use the [brief template](assets/templates/brief.md).
+
+Codex agents launch through [codex_task.sh](codex_task.sh), backed by
+[codex_task.py](scripts/codex_task.py). The wrapper invokes the installed Codex CLI and
+records prompts, sessions, attempts, results, and usage. Native Claude agents use the
+host's available agent tool. The current policy permits Codex Luna/Terra/Sol workers,
+requires independent Opus final review, and uses local Sonnet for capability restrictions;
+Astra is excluded. Read [model selection and fallback rules](references/model-routing.md)
+before dispatch. A role assignment does not supply missing model access, browser tools,
+credentials, or permissions.
+
+## Bundled tools
+
+Paths are relative to this installed skill directory. Run Python helpers with `python3`;
+use the linked references for full commands and when to use each tool.
+
+| Tool | What it gives the orchestrator | Guide |
+| --- | --- | --- |
+| [codex_task.sh](codex_task.sh) / [codex_task.py](scripts/codex_task.py) | `run`, `resume`, and `cost`; worker locks, saved attempts, and observed usage | [Delegation](references/delegation.md) |
+| [scaffold.py](scripts/scaffold.py) | A compact run record, or expanded planning templates when useful | [Execution](references/execution.md) |
+| [check_evidence.py](scripts/check_evidence.py) | Execute a check, record its inputs/result, and determine whether evidence can be reused | [Verification](references/verification.md) |
+| [review_gate.py](scripts/review_gate.py) | Capture the complete integrated diff and verify approval of the exact content | [Code review](references/code-review.md) |
+| [review_copy.py](scripts/review_copy.py) | Export the reviewed source or baseline for isolated checks | [Execution](references/execution.md) |
+| [run_state.py](scripts/run_state.py) | Observe Git/worker state, planning policy, completed commits, and next action | [Recovery](references/recovery.md) |
+
+Product changes stay in the product worktree. Operational evidence normally stays in
+`~/.claude/implement/<repo>-<slug>/`. Optional [SpecStory history](references/specstory.md)
+adds conversation context for recovery and workflow improvement. Read the relevant
+reference when needed; the coordinator does not need to load every reference up front.
+
+## Coordinator authority
 
 The coordinator owns the outcome and chooses the route: implement directly or delegate,
 group and order tasks, select tests, reuse evidence, and decide when intermediate review
@@ -46,16 +105,10 @@ separate owner-mandated design approval. `plan_ready` records actual matching ap
 
 ## Choose the people and checks
 
-Use the tools in [delegation.md](references/delegation.md) when delegation saves elapsed
-time or supplies independent expertise. Available roles: coding, verification, QA,
-diagnosis, and final review. These are options, not required stages. Combine related
-changes; a small fix can be done by the coordinator with no coding agent.
-
-Choose permitted models using [model-routing.md](references/model-routing.md). Preserve
-the existing owner policy: Codex Luna/Terra/Sol workers, independent Claude Opus final
-review, local Sonnet for capability restrictions; Astra excluded. Use native agent tools
-when available, or `codex_task.sh` for recorded Codex work. Do not invent unavailable
-tools or silently substitute a pinned model.
+Delegate when it saves elapsed time or supplies independent expertise. Combine related
+changes; a small fix can be done by the coordinator with no coding agent. Use the roles,
+model policy, and linked tools above; do not invent unavailable capabilities or silently
+substitute a pinned model.
 
 For each changed behavior, identify what could break and choose the smallest checks
 that meaningfully detect it. Include affected callers and shared contracts when relevant.
@@ -127,6 +180,7 @@ Test observable helper behavior, not matching prose.
 ## Installation and session history
 
 This skill is published in [mathaix/skills](https://github.com/mathaix/skills), under
-`skills/implement/`. See the repository's installation and usage documentation. For
+`skills/implement/`. See [installation](https://github.com/mathaix/skills/blob/main/docs/installation.md)
+and [usage](https://github.com/mathaix/skills/blob/main/docs/usage.md). For
 optional session capture, recovery context, and timing audits, use
 [SpecStory alongside implement](references/specstory.md). Keep real transcripts local.
