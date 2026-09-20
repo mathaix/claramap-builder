@@ -1,3 +1,5 @@
+![Claude coordinates scoped workers, validates their results, and integrates the change](skills/implement/assets/claramap-builder-hero.png)
+
 # Claramap Builder
 
 **Agent Skills to Orchestrate Code Development.**
@@ -20,8 +22,6 @@ bundled helpers support worker execution, review snapshots, and recovery.
 2. **Delegate with context.** Match workers to task complexity and give them relevant code, constraints, and acceptance criteria.
 3. **Validate and integrate.** Check returned work against the requirements, combine changes, and obtain independent review.
 4. **Iterate to completion.** Address failed checks and review findings, preserving progress across interruptions.
-
-![Claude coordinates scoped workers, validates their results, and integrates the change](skills/implement/assets/claramap-builder-hero.png)
 
 Give it a concrete goal in your project:
 
