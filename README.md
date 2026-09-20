@@ -12,7 +12,9 @@ changes, and iterates until the requested behavior is implemented and the requir
 checks pass.
 
 The skill bundles instructions, references, spec templates, and executable helpers.
-The current implementation uses **Claude Code, Codex, SpecStory, and SpecFlow**.
+The current implementation runs on **Claude Code, Codex, and SpecStory**, with
+**SpecFlow** guiding the workflow and **Kiro-style specs using EARS** structuring the
+feature documents. See [attribution](#attribution).
 The AgentSkill format can be adapted to other coding harnesses; the shipped setup
 uses Claude Code as its host. See [harness support](docs/architecture.md#agent-skill-packaging-and-harness-support).
 
@@ -161,7 +163,34 @@ requested. Compare later runs to see whether those changes helped. See the
 | [Contributing](CONTRIBUTING.md) | Repository structure, tests, and contribution guidance |
 
 The installed agent instructions live in [implement](skills/implement/SKILL.md) and
-[improve-workflow](skills/improve-workflow/SKILL.md). The bundled templates apply
-[SpecFlow planning concepts](skills/implement/references/spec-format.md).
+[improve-workflow](skills/improve-workflow/SKILL.md). See the
+[spec format and provenance](skills/implement/references/spec-format.md).
+
+## Attribution
+
+Claramap Builder combines existing ideas with its own orchestration and verification
+helpers. Credit for the foundations belongs to:
+
+- **[Kiro](https://kiro.dev/docs/specs/feature-specs/):** the three-file feature-spec
+  layout (`requirements.md`, `design.md`, `tasks.md`), EARS-based requirements,
+  tasks that cite requirement IDs, and keeping specs versioned with the code.
+  See its [requirements-first workflow](https://kiro.dev/docs/specs/feature-specs/requirements-first/)
+  and [version-control guidance](https://kiro.dev/docs/specs/best-practices/).
+- **[EARS — Easy Approach to Requirements Syntax](https://alistairmavin.com/ears/):**
+  the event-driven `WHEN … THE SYSTEM SHALL …` sentence form. Developed by Alistair
+  Mavin and colleagues and first published in 2009, EARS predates both Kiro and SpecFlow.
+- **[SpecFlow](https://github.com/specstoryai/specflow):** the five-phase framing of
+  intent, roadmap, tasks, execute, and refine, including assigning tasks to humans or
+  AI. Its [prompt-context concept](https://www.specflow.com/getting-started.html#step-41-prepare-your-ai-assistant)
+  carries into our [worker briefs](skills/implement/assets/templates/brief.md).
+  `/improve-workflow` applies the Refine phase to the development workflow itself.
+- **[SpecStory](https://github.com/specstoryai/getspecstory):** the conversation-capture
+  tooling used by the current implementation, and the publisher of SpecFlow. Its CLI
+  is an installed dependency; its captured history supports recovery and workflow analysis.
+
+The templates are our adaptations. Worker model routing, execution records, review
+snapshots, and recovery helpers are Claramap Builder's implementation. Kiro, EARS,
+and SpecFlow supply structure and methodology and require no separate installation
+for this skill; SpecStory supplies a tool that must be installed for capture.
 
 Built by [mathaix](https://github.com/mathaix).

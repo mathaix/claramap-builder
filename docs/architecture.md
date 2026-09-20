@@ -210,11 +210,26 @@ spec templates, and worker briefs.
 | Contextual execution | Worker briefs provide relevant project context, constraints, and expected results. |
 | Refinement | The coordinator validates results, repairs defects, and updates remaining work. |
 
-The [bundled spec format](../skills/implement/references/spec-format.md) stores this
-information in `requirements.md`, `design.md`, and `tasks.md`. Those filenames and
-the detailed review/evidence fields are Claramap Builder conventions, not a claim
-that SpecFlow prescribes this exact layout. Existing project specifications remain
-authoritative inputs.
+The [bundled spec format](../skills/implement/references/spec-format.md) combines
+this methodology with Kiro's three-file feature-spec layout and EARS requirements.
+SpecFlow's human/AI task assignments inform executor selection, and its prompt-context
+concept informs worker briefs. `/improve-workflow` applies the Refine phase to the
+workflow itself. SpecStory is both SpecFlow's publisher and the provider of the
+capture CLI used by this implementation.
+
+### Kiro and EARS: the feature-spec structure
+
+[Kiro feature specs](https://kiro.dev/docs/specs/feature-specs/) inform the
+`requirements.md`, `design.md`, and `tasks.md` layout, task references to requirement
+IDs, and versioning specs with code. Its use of EARS informs how the requirements
+are written.
+
+[EARS](https://alistairmavin.com/ears/) is the original source of the event-driven
+`WHEN … THE SYSTEM SHALL …` syntax. Alistair Mavin and colleagues first published it
+in 2009, before Kiro and SpecFlow. These are structural influences rather than
+installed dependencies. Claramap Builder adds its own checks, execution records,
+review snapshots, and recovery helpers. See the full [attribution](../README.md#attribution).
+Existing project specifications remain authoritative inputs.
 
 SpecFlow is used as the planning method within the skill. There is no separate
 SpecFlow executable, imported package, or service to install for these helpers.

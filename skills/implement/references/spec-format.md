@@ -1,16 +1,34 @@
 # Spec format
 
-Claramap Builder uses [SpecFlow](https://www.specflow.com/getting-started.html) to
-structure intent, planning, scoped tasks, contextual execution, and refinement.
-The bundled templates apply those concepts in `specs/<slug>/`: requirements capture
-intent and acceptance criteria, design records the approach and decisions, and tasks
-break the work into assignments with observable checks. Worker briefs carry the
-relevant intent and task context into execution.
+Claramap Builder follows SpecFlow's planning and refinement methodology, with custom
+requirements, design, and task templates using a Kiro-style feature-spec structure.
+The templates live in `assets/templates/` and produce `specs/<slug>/` in the product
+repository.
 
-These are Claramap Builder's own templates, committed with the code. Their filenames,
-requirement IDs, EARS statements, and review/evidence fields are local conventions;
-SpecFlow does not prescribe this exact file layout. No separate SpecFlow runtime
-package is required.
+## Sources and adaptations
+
+- [Kiro feature specs](https://kiro.dev/docs/specs/feature-specs/) inform the
+  `requirements.md`, `design.md`, and `tasks.md` layout, requirements expressed in
+  EARS, and task references back to requirement IDs. Specs are committed with the
+  code, consistent with Kiro's [version-control guidance](https://kiro.dev/docs/specs/best-practices/).
+- [EARS](https://alistairmavin.com/ears/) supplies the event-driven
+  `WHEN … THE SYSTEM SHALL …` pattern. Alistair Mavin and colleagues first published
+  EARS in 2009; the syntax predates Kiro and SpecFlow.
+- [SpecFlow](https://github.com/specstoryai/specflow) supplies the five-phase framing:
+  intent, roadmap, tasks, execute, refine. Its human/AI task assignments inform
+  executor selection; its [prompt-context guidance](https://www.specflow.com/getting-started.html#step-41-prepare-your-ai-assistant)
+  informs [brief.md](../assets/templates/brief.md). The companion `improve-workflow`
+  skill applies refinement to the development process.
+- [SpecStory](https://github.com/specstoryai/getspecstory) publishes SpecFlow and
+  provides the conversation-capture CLI used alongside these records.
+
+These are adapted templates, not an imported official template pack. Explicit check
+commands and executors, evidence paths, review status, and deferred-finding fields
+are Claramap Builder extensions. Kiro, EARS, and SpecFlow do not need installation;
+SpecStory CLI is a capture dependency. Existing project specifications remain
+authoritative inputs.
+
+## Files
 
 | File | Holds | Not here |
 | --- | --- | --- |
