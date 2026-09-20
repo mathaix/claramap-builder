@@ -6,7 +6,7 @@ Reusable skills by [mathaix](https://github.com/mathaix).
 
 | Skill | What it does |
 | --- | --- |
-| [implement](skills/implement/SKILL.md) | Helps Claude deliver a feature, fix, or PR as one checked, independently reviewed code change, with Codex and Claude agents brought in when useful. |
+| [implement](skills/implement/SKILL.md) | A capable Claude coordinator gives scoped tasks and context to Codex workers, then integrates and verifies their work for independent final review. |
 | [improve-workflow](skills/improve-workflow/SKILL.md) | Reviews execution reports and SpecStory history to find bottlenecks and improve the development workflow. |
 
 ## Install a skill

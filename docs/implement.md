@@ -4,7 +4,9 @@
 
 ![Claude coordinates task-specific agents and brings their work together as a verified result](../skills/implement/assets/implement-workflow.png)
 
-Give Claude a feature, fix, or unfinished PR. Implement helps deliver one integrated code change with checks against your acceptance criteria and an independent final review. Claude coordinates Codex and Claude agents when the work benefits from them. For a small change, Claude can work directly.
+Give Claude a feature, fix, or unfinished PR. Implement helps deliver one integrated code change with checks against your acceptance criteria and an independent final review.
+
+A high-capability Claude session holds the full goal. It assigns focused tasks to Codex workers, aiming to use faster, lower-cost models for clear work and stronger ones when the task is uncertain. Each worker gets a brief with the expected result, relevant code and revision, allowed actions, and checks. Claude brings the results together and verifies them. It can handle a small change itself.
 
 ## Start a run
 
@@ -25,7 +27,7 @@ Include the outcome, acceptance conditions, environment constraints, and any aut
 ## How a run works
 
 1. **Define success:** Claude reads the request and code, then records what the result must do. Larger tasks may use optional planning documents adapted from [SpecFlow concepts](../skills/implement/references/specflow.md).
-2. **Build with the right crew:** Claude works directly or assigns focused jobs to Codex or native Claude agents according to complexity and available capabilities.
+2. **Build with the right crew:** Claude works directly or gives each Codex or native Claude agent a scoped task and the context needed to complete it. The worker model is chosen for that task's complexity and available capabilities.
 3. **Prove the change:** Claude integrates the work, runs relevant checks, and tests the actual user journey when needed. A worker's completion report still needs acceptance evidence.
 4. **Review and deliver:** a separate Claude Opus agent reviews the complete change. Claude addresses blocking findings and reports the outcome and remaining risks.
 

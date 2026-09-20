@@ -1,6 +1,6 @@
 ---
 name: implement
-description: "Take a feature, fix, or PR from request to checked, independently reviewed code. Claude coordinates the work and brings in Codex or Claude agents when useful. Use for /implement and implementation requests."
+description: "Take a feature, fix, or PR from request to checked, independently reviewed code. A capable Claude coordinator gives scoped work and context to Codex agents chosen for each task. Use for /implement and implementation requests."
 ---
 
 # Implement — from request to reviewed code
@@ -9,22 +9,25 @@ description: "Take a feature, fix, or PR from request to checked, independently 
 
 Give Claude a feature, bug, or unfinished PR. Implement helps it deliver an integrated
 code change, evidence that the requested behavior works, and an independent final
-review. You set the goal and constraints. Claude coordinates the work and reports what
-was changed, checked, and left open.
+review. You set the goal and constraints; Claude reports what changed, what passed,
+and what remains open.
 
-Claude can handle a small change itself. For broader or uncertain work, it assembles a
-task-specific crew: Codex workers can investigate, code, verify, or run QA when they
-have the needed access; native Claude agents provide supported local fallbacks and
-independent review. Claude chooses the people and checks to fit the job, then brings
-their results together. A worker's completion report is a claim for Claude to verify.
+The design puts a high-capability Claude session in charge of the whole goal. It breaks
+larger work into bounded tasks and gives Codex workers focused briefs: the expected
+result, relevant code and revision, permitted actions, and assigned checks. Claude
+chooses a worker model for each task, aiming to use faster, lower-cost options for
+clear work and stronger ones when uncertainty warrants them. Native Claude agents
+provide supported local fallbacks and independent review. Claude can handle a small
+change itself; it integrates and verifies delegated results before accepting them.
 
 ## How a run works
 
 1. **Frame the result.** Claude reads the request and code, then records what success
    looks like. Larger tasks may use optional planning documents adapted from
    [SpecFlow concepts](references/specflow.md).
-2. **Do the work.** Claude handles tasks directly or gives focused assignments to
-   Codex or native Claude agents based on complexity, uncertainty, and capability.
+2. **Assign focused work.** Claude handles tasks directly or sends a brief with the
+   specific context each Codex or native Claude agent needs. It matches worker model
+   and capability to the task.
 3. **Check the result.** Claude integrates the work, runs checks against the requested
    behavior, and tests the real user journey where needed. Run records preserve useful
    evidence and progress across sessions.
