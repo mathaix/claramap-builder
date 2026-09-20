@@ -1,23 +1,83 @@
-# Using the skills
+# Your first build with Mathaix Build
 
-[Collection home](../README.md) · [Installation](installation.md)
+[Mathaix Build](../README.md) · [Installation and configuration](installation.md) · [How orchestration works](implement.md)
 
-Use **implement** to deliver a code change. Use **improve-workflow** to understand how development ran and improve the process. They can be installed separately; together they form a feedback loop. Start with [requirements by capability and launch commands](installation.md#requirements).
+Start with a small feature or bug fix in an existing Git repository. Give `/implement`
+a concrete outcome and a way to recognize success.
 
-| Your task | Start here | Agent instructions |
-| --- | --- | --- |
-| Build a feature, fix a bug, or finish a PR | [Implement guide](implement.md) | [implement/SKILL.md](../skills/implement/SKILL.md) |
-| Find delays, compare runs, or improve orchestration and checks | [Improve-workflow guide](improve-workflow.md) | [improve-workflow/SKILL.md](../skills/improve-workflow/SKILL.md) |
-| Install, update, or remove either skill | [Installation](installation.md) | — |
-| Capture conversations and interpret execution records | [SpecStory and evidence guide](../skills/improve-workflow/references/specstory.md) | — |
+## 1. Install and check access
 
-## How they work together
+Follow [installation](installation.md#personal-installation) to install `implement`.
+You need authenticated Claude Code, Python 3.11+, Git, SpecStory, and access to the
+[configured independent reviewer](installation.md#model-policy). Codex CLI and an
+allowed worker model are needed if Claude delegates work to Codex.
 
-1. **Implement** coordinates coding, verification, QA, and review in your product repository.
-2. Its implementation folder records attempts, checks, and outcomes. **SpecStory** history adds conversation context.
-3. **Improve-workflow** reads that evidence to explain delays and verification gaps, then recommends changes or applies them when requested.
-4. Use the updated skill on later work. Compare similar runs to see whether the change helped without losing verification coverage.
+The installer copies the skill; it does not install or authenticate these dependencies.
 
-![The feedback loop from implementation to workflow improvement](../skills/improve-workflow/assets/workflow-feedback.png)
+## 2. Start in your project
 
-This loop is driven by your requests. Completing an implementation does not automatically start an audit or rewrite a skill.
+```sh
+cd /path/to/your/project
+specstory run claude --no-cloud-sync
+```
+
+When using Codex workers, also keep background capture running in another terminal
+in the relevant worktree:
+
+```sh
+specstory watch --no-cloud-sync
+```
+
+See the [capture setup](installation.md#run-claude-and-codex-through-specstory) for
+separate worktrees and how to confirm worker sessions are captured.
+
+## 3. Give it a goal
+
+```text
+/implement Fix the display-name setting: it appears saved but disappears after
+reload. Reproduce the bug, preserve existing account permissions, and verify the fix.
+```
+
+Include known constraints and acceptance criteria. Claude inspects the project,
+breaks down the work, and chooses direct implementation or scoped workers. Delegated
+workers receive relevant context and a model selected for the task's complexity.
+Claude validates and integrates their results, addresses failures, and obtains an
+independent review.
+
+You can steer the work with existing specs, model preferences, budget constraints,
+and environment access. Those constraints remain in force throughout the run.
+
+## 4. Inspect the result
+
+The final report explains the delivered behavior, checks performed, review outcome,
+and remaining limitations. A successful worker exit alone does not establish completion.
+Required checks and independent review must pass; unavailable access or evidence stays
+explicitly pending.
+
+| Record | Where to find it |
+| --- | --- |
+| Requirements, design, and task progress for larger changes | `specs/<slug>/` in your project |
+| Worker attempts, review snapshots, and recovery state | `~/.claude/implement/<project>-<slug>/` by default |
+| Captured conversation history | `.specstory/history/` in the relevant worktree |
+
+The [illustrative walkthrough](../skills/implement/references/example-run.md) shows
+these records using a synthetic example. Keep your real transcripts and execution
+logs local.
+
+## Resume interrupted work
+
+In the project, ask:
+
+```text
+/implement Resume the existing run for the display-name fix. Reconcile Git and
+worker state, preserve partial changes and open findings, and continue remaining work.
+```
+
+The coordinator checks whether workers are still active before dispatching more work
+and reuses evidence that remains valid. See [recovery details](../skills/implement/references/recovery.md).
+
+## Improve the next build
+
+Install the companion `improve-workflow` skill when you want to investigate how a run
+went. Ask it to explain repeated checks, slow handoffs, or missing verification, then
+apply the changes you choose. Start with the [workflow improvement guide](improve-workflow.md).

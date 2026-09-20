@@ -1,6 +1,13 @@
-# Installation
+# Install and configure Mathaix Build
 
-[All guides](usage.md) · [Implement guide](implement.md) · [Improve-workflow guide](improve-workflow.md)
+[Mathaix Build](../README.md) · [Your first build](usage.md) · [Implement guide](implement.md) · [Improve-workflow guide](improve-workflow.md)
+
+Install `implement` to orchestrate code development. Add `improve-workflow` when you
+want to analyze completed runs. The skills can be installed independently; their
+commands remain `/implement` and `/improve-workflow`.
+
+For the first-run sequence, use [Your first build](usage.md). This page covers
+prerequisites, capture, model configuration, installation options, and maintenance.
 
 ## Requirements
 

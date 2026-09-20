@@ -1,91 +1,106 @@
-# Skills
+# Mathaix Build
 
-Two Claude Code skills for implementing code changes and improving how that work runs.
-**Implement** coordinates coding, checks, and independent review, with optional Codex
-workers. **Improve-workflow** analyzes saved run evidence to identify delays and
-verification gaps. The skills guide Claude; their helpers support individual steps.
-Reusable skills by [mathaix](https://github.com/mathaix).
+**Agent Skills to Orchestrate Code Development.**
 
-| Skill | What it does |
-| --- | --- |
-| [implement](skills/implement/SKILL.md) | A capable Claude coordinator gives scoped tasks and context to Codex workers, then integrates and verifies their work for independent final review. |
-| [improve-workflow](skills/improve-workflow/SKILL.md) | Reviews execution reports and SpecStory history to find bottlenecks and improve the development workflow. |
+Mathaix Build is an open-source agent orchestrator that turns a development goal into
+built, checked, and independently reviewed code. It breaks the goal into manageable
+tasks, gives each worker the context it needs, and selects models based on task
+complexity. It validates what comes back, integrates the changes, and iterates until
+the requested behavior is implemented and the required checks pass.
 
-## Install a skill
+Claude Code coordinates the work through `/implement`, with optional Codex workers.
+Small, settled changes can be handled directly. The skills provide the instructions;
+bundled helpers support worker execution, review snapshots, and recovery.
 
-Copying a skill requires Python 3.11+. Running the documented workflow uses Claude Code,
-Git, and SpecStory capture; Codex CLI is needed for delegated Codex workers. The installer
-does not install or authenticate these programs. See [requirements by capability](docs/installation.md#requirements).
-Implement's helpers support macOS/Linux; use WSL on Windows.
+[Get started](docs/usage.md) · [How it works](docs/implement.md) · [Installation](docs/installation.md)
+
+## From goal to built code
+
+1. **Break down the goal.** Inspect the codebase, establish requirements, and identify scoped tasks.
+2. **Delegate with context.** Match workers to task complexity and give them relevant code, constraints, and acceptance criteria.
+3. **Validate and integrate.** Check returned work against the requirements, combine changes, and obtain independent review.
+4. **Iterate to completion.** Address failed checks and review findings, preserving progress across interruptions.
+
+![Claude coordinates scoped workers, validates their results, and integrates the change](skills/implement/assets/implement-workflow.png)
+
+Give it a concrete goal in your project:
+
+```text
+/implement Add a display-name setting. Save it using the existing profile API,
+preserve account permissions, and verify that it survives a page reload.
+```
+
+You get code changes, recorded check results, independent review findings, and saved
+progress for resuming the work. Larger changes also include requirements, design,
+and tasks committed alongside the code. Missing access or unresolved requirements
+are reported as blockers; unfinished work stays visible.
+
+See the [illustrative walkthrough](skills/implement/references/example-run.md) for the
+records and review process. It is a synthetic example, not a measured execution report.
+
+## Get started
+
+Use Claude Code with Python 3.11+, Git, SpecStory capture, and access to the configured
+independent reviewer. Codex CLI is needed when delegating to Codex workers. Helpers
+support macOS/Linux and Windows through WSL. See [setup and model access](docs/installation.md#requirements).
 
 ```sh
 git clone https://github.com/mathaix/skills.git ~/mathaix-skills
 cd ~/mathaix-skills
 python3 scripts/install.py implement
-python3 scripts/install.py improve-workflow
 ```
 
-Each command installs only the named skill into `~/.claude/skills/<name>/`. You can install either skill independently. Existing installations are preserved unless you explicitly request replacement.
-
-**Model access:** implement enforces its [model policy](skills/implement/model-policy.json).
-Check access to the selected worker and independent reviewer before dispatching;
-see [policy configuration](docs/installation.md#model-policy).
-
-## Use the skills together
-
-**Implement delivers the code change. Improve-workflow improves how that work gets done.**
-
-Start Claude Code through SpecStory in your product repository:
+Then start Claude in your product repository:
 
 ```sh
+cd /path/to/your/project
 specstory run claude --no-cloud-sync
 ```
 
-Then invoke the skill:
+Enter `/implement` followed by your goal. The [first-build guide](docs/usage.md) covers
+worker capture, what to expect, and how to resume. The installer copies the skill into
+`~/.claude/skills/implement`; it preserves existing installations unless you request replacement.
 
-```text
-/implement Fix the input-save bug. Reproduce it locally, implement the fix, and verify the affected flow.
+Mathaix Build is [MIT licensed](LICENSE). Model usage runs through your existing
+accounts and is subject to their billing. Check the [model policy](docs/installation.md#model-policy)
+before dispatching workers.
+
+## Improve how the next build runs
+
+The companion `/improve-workflow` skill examines completed runs to find repeated work,
+slow handoffs, and verification gaps. Ask why a small fix took an hour, where checks
+were duplicated, or what should change before the next build.
+
+Install it from this repository:
+
+```sh
+python3 scripts/install.py improve-workflow
 ```
 
-After a run, inspect its implementation records and SpecStory history:
+Then ask in your project:
 
 ```text
-/improve-workflow Review recent runs. Find repeated work and bottlenecks, and recommend improvements without editing yet.
+/improve-workflow Review the last three runs. Find repeated work and bottlenecks,
+and recommend improvements without editing yet.
 ```
 
-Ask improve-workflow to apply the changes you want. Use the updated skill for later development and compare the results.
-
-![How SpecStory and implementation evidence improve the workflow](skills/improve-workflow/assets/workflow-feedback.png)
+It connects findings to recorded evidence and can apply targeted improvements when
+requested. Compare later runs to see whether those changes helped. See the
+[workflow improvement guide](docs/improve-workflow.md).
 
 ## Documentation
 
-| Guide | What you will find |
+| Guide | Purpose |
 | --- | --- |
-| [Start here: how the skills connect](docs/usage.md) | Choose a skill and understand the feedback loop |
-| [Installation](docs/installation.md) | Requirements, personal/project setup, model policy, updates, and removal |
-| [Using implement](docs/implement.md) | Requests, orchestrator and subagent roles, executable tools, and completion criteria |
-| [A complete example run](skills/implement/references/example-run.md) | A small request through records, checks, review, and final response |
-| [Using improve-workflow](docs/improve-workflow.md) | Audit runs, apply improvements, and measure the next run |
-| [SpecStory and implementation evidence](skills/improve-workflow/references/specstory.md) | Capture history, locate records, and interpret timings |
+| [Your first build](docs/usage.md) | Install, give a goal, inspect the result, and resume |
+| [How orchestration works](docs/implement.md) | Task scoping, worker selection, validation, and completion |
+| [Installation and configuration](docs/installation.md) | Prerequisites, model policy, project setup, updates, and removal |
+| [Improve the next build](docs/improve-workflow.md) | Investigate runs and apply evidence-based improvements |
+| [Illustrative walkthrough](skills/implement/references/example-run.md) | Follow a request through specs, checks, and review |
+| [Contributing](CONTRIBUTING.md) | Repository structure, tests, and contribution guidance |
 
-## Repository layout
+The installed agent instructions live in [implement](skills/implement/SKILL.md) and
+[improve-workflow](skills/improve-workflow/SKILL.md). Spec templates follow the
+[Kiro feature-spec structure](skills/implement/references/spec-format.md).
 
-```text
-skills/
-  implement/        # Code-development orchestrator and executable helpers
-  improve-workflow/ # Workflow analysis, feedback loop, and improvement guidance
-docs/              # Collection installation and usage
-scripts/install.py # Install one selected skill
-tests/             # Installer tests
-```
-
-Run checks without model calls or credentials:
-
-```sh
-python3 -m unittest discover -s skills/implement/tests -v
-python3 -m unittest discover -s tests -v
-```
-
-Runtime reports and SpecStory transcripts belong in local run/project directories. This repository contains the reusable skill, not real interview transcripts or private implementation history.
-
-[MIT license](LICENSE). Spec templates follow the [Kiro feature-spec structure](skills/implement/references/spec-format.md).
+Built by [mathaix](https://github.com/mathaix).

@@ -1,8 +1,19 @@
-# Using improve-workflow
+# Improve how the next build runs
 
-[All guides](usage.md) · [Installation](installation.md) · [Implement guide](implement.md)
+[Mathaix Build](../README.md) · [Your first build](usage.md) · [Installation](installation.md) · [Implement guide](implement.md)
 
-Improve-workflow examines how code development ran: where time went, which work repeated, and what verification was missing. It can recommend changes or update the relevant skill and tools when you ask it to.
+`/improve-workflow` is Mathaix Build's feedback loop. It examines completed work to
+explain where time went, which work repeated, and what verification was missing.
+It recommends changes and can update the relevant skills and tools when requested.
+
+Use it to investigate concrete questions:
+
+- Why did a small fix take an hour?
+- Did multiple workers repeat the same checks on unchanged code?
+- Where did handoffs or environment failures hold up the build?
+- Did a shorter run leave important behavior unverified?
+
+An implementation run does not automatically start an audit or rewrite a skill.
 
 ## Review a run
 
@@ -19,6 +30,7 @@ The skill reads relevant summaries first, then checks attempts, test records, re
 
 | Source | What it contributes |
 | --- | --- |
+| `specs/<slug>/` in the product repository | Requirements, design decisions, tasks, and recorded progress |
 | `~/.claude/implement/<project>-<task>/` | Run status, worker attempts, check evidence, review outcomes, and recovery state from implement |
 | `.specstory/history/` in the product worktree | Captured conversation history: changed requests, handoffs, and waits |
 | Relevant source and Git state | The instructions, tools, and revisions behind the reported behavior |

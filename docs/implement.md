@@ -1,11 +1,11 @@
-# Using implement
+# How Mathaix Build orchestrates development
 
-[All guides](usage.md) · [Installation](installation.md) · [Improve-workflow guide](improve-workflow.md)
+[Mathaix Build](../README.md) · [Your first build](usage.md) · [Installation and configuration](installation.md)
 
-Implement helps Claude deliver a code change with checks against your acceptance criteria
-and an independent final review. Claude can do the work directly or assign scoped tasks
-to Codex workers. The skill supplies instructions and supporting tools; Claude decides
-when to use them.
+`/implement` is Mathaix Build's primary command. It turns a goal into scoped work,
+coordinates execution, and validates the integrated result. Claude Code holds the
+full goal and makes orchestration decisions; Codex workers take bounded assignments
+when delegation is useful.
 
 ![Claude coordinates workers and integrates a verified result](../skills/implement/assets/implement-workflow.png)
 
@@ -29,13 +29,27 @@ steps. A request to fix code does not automatically authorize deployment or mess
 The [complete synthetic example](../skills/implement/references/example-run.md) shows a
 request, run record, check evidence, review verdict, and final response.
 
-## What to expect
+## From goal to completed change
 
-Claude inspects the code, records success criteria, implements directly or delegates,
-integrates changes, and verifies the result. Separate design review and intermediate
-code reviews are optional unless required by you or the repository. Independent final
-review remains required. Coding, diagnosis, verification, and QA are available roles,
-not four compulsory stages.
+1. **Break down the goal.** Claude inspects the relevant code and constraints, establishes acceptance criteria, and identifies tasks with observable checks.
+2. **Delegate with context.** Each worker receives the relevant revision, code paths, requirements, allowed changes, and assigned checks. Independent coding work uses isolated worktrees.
+3. **Validate and integrate.** Claude inspects returned work, checks affected behavior, integrates changes, and obtains independent review of the final content.
+4. **Iterate to completion.** Failed checks and blocking review findings return to the coordinator for repair. After repeated failed repairs, it reassesses the cause and approach. Missing access or authorization is reported, and unproven work stays open.
+
+## Match workers to the work
+
+Model selection depends on uncertainty and interaction. A mechanical change with an
+established example can use a lighter worker; ordinary integrations call for more
+capability; subtle state, concurrency, or permission changes need stronger reasoning.
+Each brief records the selected model, effort, and reason, within your model policy
+and budget. See [model routing](../skills/implement/references/model-routing.md).
+
+Small, settled changes can be implemented directly. Coding, diagnosis, verification,
+and QA are available assignments. Separate design review is used for consequential
+open questions or when required by you or the repository. Independent final review
+remains required.
+
+## Keep the goal and progress recoverable
 
 Beyond a small change, the spec lives in your repository at `specs/<slug>/`:
 `requirements.md` in EARS form (WHEN ... THE SYSTEM SHALL ...), `design.md`, and a
