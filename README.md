@@ -40,37 +40,11 @@ The [installation guide](docs/installation.md#requirements) gives the setup orde
 checks. The [architecture guide](docs/architecture.md) explains capture records and
 how the components connect.
 
-## From goal to built code
+## Developer workflow
 
-1. **Break down the goal.** Inspect the codebase, establish requirements, and identify scoped tasks.
-2. **Delegate with context.** Match workers to task complexity and give them relevant code, constraints, and acceptance criteria.
-3. **Validate and integrate.** Check returned work against the requirements, combine changes, and obtain independent review.
-4. **Iterate to completion.** Address failed checks and review findings, preserving progress across interruptions.
+### One-time setup
 
-Give it a concrete goal in your project:
-
-```text
-/implement Add a display-name setting. Save it using the existing profile API,
-preserve account permissions, and verify that it survives a page reload.
-```
-
-You get code changes, recorded check results, independent review findings, and saved
-progress for resuming the work. Larger changes also include requirements, design,
-and tasks committed alongside the code. Missing access or unresolved requirements
-are reported as blockers; unfinished work stays visible.
-
-Feature specs live in **your product repository at `specs/<slug>/`**. Worker records
-and review evidence stay in `~/.claude/implement/`; captured conversations live in
-the worktree’s `.specstory/history/`. See [Where files live](docs/architecture.md#where-files-live).
-
-See the [illustrative walkthrough](skills/implement/references/example-run.md) for the
-records and review process. It is a synthetic example, not a measured execution report.
-
-## Get started
-
-Use Claude Code with Python 3.11+, Git, SpecStory capture, and access to the configured
-independent reviewer. Codex CLI is needed when delegating to Codex workers. Helpers
-support macOS/Linux and Windows through WSL. See [setup and model access](docs/installation.md#requirements).
+Install and authenticate the tools listed above, then install the skill:
 
 ```sh
 git clone https://github.com/mathaix/claramap-builder.git ~/claramap-builder
@@ -78,20 +52,58 @@ cd ~/claramap-builder
 python3 scripts/install.py implement
 ```
 
-Then start Claude in your product repository:
+This copies the primary skill into `~/.claude/skills/implement`, making `/implement`
+available across your projects. You do not repeat this installation for each build.
+See [installation and updates](docs/installation.md) for model access, project-specific
+installation, and upgrading the skill.
 
-```sh
-cd /path/to/your/project
-specstory run claude --no-cloud-sync
-```
+### For each development goal
 
-Enter `/implement` followed by your goal. The [first-build guide](docs/usage.md) covers
-worker capture, what to expect, and how to resume. The installer copies the skill into
-`~/.claude/skills/implement`; it preserves existing installations unless you request replacement.
+1. **Start in your project.** Open Claude with session capture from the product repository:
+
+   ```sh
+   cd /path/to/your/project
+   specstory run claude --no-cloud-sync
+   ```
+
+   When using Codex workers, keep `specstory watch --no-cloud-sync` running in another
+   terminal in the relevant worktree. See [capture setup](docs/installation.md#run-claude-and-codex-through-specstory).
+   An existing captured session can handle subsequent goals.
+
+2. **Describe the outcome.** Give the skill a goal, constraints, and acceptance criteria:
+
+   ```text
+   /implement Add a display-name setting. Save it using the existing profile API,
+   preserve account permissions, and verify that it survives a page reload.
+   ```
+
+3. **Build and iterate.** Claude inspects the code, creates specs where needed, and
+   breaks the goal into scoped work. It gives workers relevant context, selects models
+   for task complexity, validates returned work, and integrates the changes. Failed
+   checks and blocking review findings return for repair; missing access or unresolved
+   requirements remain explicit blockers.
+
+4. **Inspect the result.** Review the changed code, check results, independent review
+   findings, and remaining gaps. Larger changes include requirements, design, and task
+   progress in **your product repository at `specs/<slug>/`**. Run evidence stays in
+   `~/.claude/implement/`, and conversations in the worktree's `.specstory/history/`.
+   See [Where files live](docs/architecture.md#where-files-live).
+
+5. **Commit and publish through your project workflow.** Have the coordinator perform
+   authorized Git and PR actions, or handle them yourself. Commit product specs with
+   the code, keep raw run records local, and satisfy your repository's review and CI
+   requirements. Specify deployment separately when you want it.
+
+6. **Resume or improve when needed.** If interrupted, ask `/implement` to resume the
+   existing run, reconcile Git and worker state, and continue remaining work. After a
+   build, use `/improve-workflow` to investigate bottlenecks and recommend improvements.
+
+The [first-build guide](docs/usage.md) provides more detail. The
+[illustrative walkthrough](skills/implement/references/example-run.md) shows the
+records and review process using a synthetic example.
 
 Claramap Builder is [MIT licensed](LICENSE). Model usage runs through your existing
-accounts and is subject to their billing. Check the [model policy](docs/installation.md#model-policy)
-before dispatching workers.
+accounts and is subject to their billing.
 
 ## Improve how the next build runs
 
