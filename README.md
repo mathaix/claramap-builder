@@ -18,6 +18,26 @@ uses Claude Code as its host. See [harness support](docs/architecture.md#agent-s
 
 [Install the skill](docs/usage.md) · [How it works](docs/implement.md) · [Architecture](docs/architecture.md)
 
+## Why I built this
+
+I built Claramap Builder to make agent-driven development easier to coordinate,
+inspect, and improve. Three goals shaped it:
+
+1. **Orchestrate development across coding harnesses.** Package the workflow as an
+   AgentSkill so its instructions, context, and development practices can travel with
+   the tools I use. The current implementation connects Claude Code and Codex;
+   adapting another harness means wiring its execution and review capabilities.
+
+2. **Use a powerful orchestrator and delegate to specific subagents.** Keep the full
+   goal and project context with a capable coordinator. Give each subagent a scoped
+   task, the context it needs, and a model matched to the work's complexity. The
+   orchestrator validates what comes back, integrates it, and drives the next iteration.
+
+3. **Capture the work so I can improve the workflow.** Preserve conversations,
+   worker attempts, check results, and review findings. Use those records to understand
+   repeated work, slow handoffs, and verification gaps, then make targeted improvements
+   and evaluate them on later runs.
+
 ## Architecture
 
 [![Claramap Builder architecture: SpecFlow structures the skill; Claude coordinates Codex workers, validates their results, and obtains independent review. SpecStory and run records support workflow analysis.](docs/assets/architecture.png)](docs/architecture.md)
