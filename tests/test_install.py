@@ -25,11 +25,18 @@ class InstallTests(unittest.TestCase):
         self.assertTrue((target / 'SKILL.md').is_file())
         self.assertEqual((target / 'LICENSE').read_text(), (ROOT / 'LICENSE').read_text())
         self.assertTrue((target / 'references/specstory.md').is_file())
+        self.assertTrue((target / 'assets/templates/requirements.md').is_file())
+        self.assertEqual(json.loads((target / 'model-policy.json').read_text()),
+                         json.loads((ROOT / 'skills/implement/model-policy.json').read_text()))
         self.assertTrue((target / 'codex_task.sh').stat().st_mode & 0o111)
         self.assertFalse((target / '.git').exists())
         smoke = subprocess.run([sys.executable, str(target / 'scripts/scaffold.py'),
-                                str(Path(self.tmp.name) / 'run'), '--compact'], capture_output=True)
+                                str(Path(self.tmp.name) / 'work'), 'demo'], capture_output=True)
         self.assertEqual(smoke.returncode, 0)
+        for script in ('review_gate.py', 'run_state.py'):
+            smoke = subprocess.run([sys.executable, str(target / 'scripts' / script), '--help'],
+                                   capture_output=True)
+            self.assertEqual(smoke.returncode, 0, smoke.stderr)
 
     def test_improvement_skill_installs_independently_with_its_assets(self):
         result = self.call('improve-workflow')

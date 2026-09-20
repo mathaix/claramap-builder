@@ -50,7 +50,7 @@ until the next runs support it; changes to the workflow are deliberate and verif
 
 ## Install and capture
 
-This workflow requires SpecStory CLI and assumes Claude Code and Codex CLI are installed and authenticated. Install SpecStory before starting development sessions. On Homebrew:
+This workflow requires SpecStory CLI and authenticated Claude Code. Delegated Codex sessions additionally require installed, authenticated Codex CLI; reading their existing exports does not. Install SpecStory before starting development sessions. On Homebrew:
 
 ```sh
 brew install specstoryai/tap/specstory
@@ -91,7 +91,7 @@ safe to publish.
 
 ## How I review a run
 
-Start with the run's `status.md`, `recovery.json`, worker `attempt-*.json`, and check records.
+Start with the product repo's `specs/<slug>/tasks.md`, then the run's `recovery.json`, worker `attempt-*.json`, and review verdicts.
 Then inspect relevant SpecStory timestamps and conversation excerpts, not the entire
 history at once. A useful prompt is:
 

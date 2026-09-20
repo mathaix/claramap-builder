@@ -1,7 +1,9 @@
 # Skills
 
-Give Claude a code task. **Implement** coordinates the work through checks and independent
-review; **improve-workflow** uses run evidence to improve how the next task is handled.
+Two Claude Code skills for implementing code changes and improving how that work runs.
+**Implement** coordinates coding, checks, and independent review, with optional Codex
+workers. **Improve-workflow** analyzes saved run evidence to identify delays and
+verification gaps. The skills guide Claude; their helpers support individual steps.
 Reusable skills by [mathaix](https://github.com/mathaix).
 
 | Skill | What it does |
@@ -11,9 +13,10 @@ Reusable skills by [mathaix](https://github.com/mathaix).
 
 ## Install a skill
 
-**Prerequisites:** install SpecStory CLI, Claude Code, and Codex CLI first, and authenticate Claude and Codex. This workflow assumes both coding agents run with SpecStory capture enabled. The skill installer does not install these programs. See [setup and launch commands](docs/installation.md#requirements).
-
-Also requires Python 3.11+ and Git. The implement helpers support macOS and Linux; use WSL on Windows.
+Copying a skill requires Python 3.11+. Running the documented workflow uses Claude Code,
+Git, and SpecStory capture; Codex CLI is needed for delegated Codex workers. The installer
+does not install or authenticate these programs. See [requirements by capability](docs/installation.md#requirements).
+Implement's helpers support macOS/Linux; use WSL on Windows.
 
 ```sh
 git clone https://github.com/mathaix/skills.git ~/mathaix-skills
@@ -24,7 +27,9 @@ python3 scripts/install.py improve-workflow
 
 Each command installs only the named skill into `~/.claude/skills/<name>/`. You can install either skill independently. Existing installations are preserved unless you explicitly request replacement.
 
-**Model access:** implement is a Claude Code workflow with a Codex worker wrapper. Its shipped policy uses Codex `gpt-5.6-luna`, `gpt-5.6-terra`, and `gpt-5.6-sol`, independent Claude Opus review, and a local Sonnet capability fallback. Those model IDs must be available to your account. See [installation and model policy](docs/installation.md) before dispatching workers.
+**Model access:** implement enforces its [model policy](skills/implement/model-policy.json).
+Check access to the selected worker and independent reviewer before dispatching;
+see [policy configuration](docs/installation.md#model-policy).
 
 ## Use the skills together
 
@@ -59,6 +64,7 @@ Ask improve-workflow to apply the changes you want. Use the updated skill for la
 | [Start here: how the skills connect](docs/usage.md) | Choose a skill and understand the feedback loop |
 | [Installation](docs/installation.md) | Requirements, personal/project setup, model policy, updates, and removal |
 | [Using implement](docs/implement.md) | Requests, orchestrator and subagent roles, executable tools, and completion criteria |
+| [A complete example run](skills/implement/references/example-run.md) | A small request through records, checks, review, and final response |
 | [Using improve-workflow](docs/improve-workflow.md) | Audit runs, apply improvements, and measure the next run |
 | [SpecStory and implementation evidence](skills/improve-workflow/references/specstory.md) | Capture history, locate records, and interpret timings |
 
@@ -82,4 +88,4 @@ python3 -m unittest discover -s tests -v
 
 Runtime reports and SpecStory transcripts belong in local run/project directories. This repository contains the reusable skill, not real interview transcripts or private implementation history.
 
-[MIT license](LICENSE). Original template adaptations retain their [provenance](skills/implement/references/specflow.md).
+[MIT license](LICENSE). Spec templates follow the [Kiro feature-spec structure](skills/implement/references/spec-format.md).

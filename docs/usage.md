@@ -2,7 +2,7 @@
 
 [Collection home](../README.md) · [Installation](installation.md)
 
-Use **implement** to deliver a code change. Use **improve-workflow** to understand how development ran and improve the process. They can be installed separately; together they form a feedback loop. The documented setup requires installed, authenticated Claude Code and Codex CLI, plus SpecStory capturing their sessions. Start with the [setup and launch commands](installation.md#requirements).
+Use **implement** to deliver a code change. Use **improve-workflow** to understand how development ran and improve the process. They can be installed separately; together they form a feedback loop. Start with [requirements by capability and launch commands](installation.md#requirements).
 
 | Your task | Start here | Agent instructions |
 | --- | --- | --- |

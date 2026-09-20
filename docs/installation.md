@@ -4,11 +4,21 @@
 
 ## Requirements
 
-This workflow assumes **SpecStory CLI, Claude Code, and Codex CLI are already installed**, with Claude and Codex authenticated. SpecStory is a required part of the documented setup: Claude and Codex sessions run with its capture enabled so improve-workflow can review their conversation history alongside implementation evidence.
+Requirements depend on the capability you use:
 
-- Install [Claude Code](https://code.claude.com/docs/en/overview) and Codex CLI, and complete their authentication setup.
-- Install [SpecStory CLI](https://docs.specstory.com/integrations/terminal-coding-agents). On Homebrew: `brew install specstoryai/tap/specstory`.
-- Install Python 3.11+ and Git. Implement's helpers use POSIX facilities on macOS/Linux; use WSL on Windows.
+| Capability | Requirements |
+| --- | --- |
+| Copy either skill into its installation directory | Python 3.11+ |
+| Run a skill in Claude | Installed, authenticated [Claude Code](https://code.claude.com/docs/en/overview) |
+| Run implement's local helpers | Python 3.11+, Git, and macOS/Linux (WSL on Windows) |
+| Delegate to Codex workers | Installed, authenticated Codex CLI with access to the selected allowed model |
+| Complete implement's independent review | Access to the policy's reviewer through Claude's native agent interface |
+| Capture the documented workflow | [SpecStory CLI](https://docs.specstory.com/integrations/terminal-coding-agents), capturing coordinator and any worker sessions |
+
+SpecStory is a workflow requirement for preserving conversation context for recovery and
+later audits; the Python helpers do not depend on it to execute. Install it with
+`brew install specstoryai/tap/specstory` on Homebrew. An audit of an older run can still
+use partial evidence when capture is missing, with that limitation reported.
 
 Check the setup:
 
@@ -21,7 +31,9 @@ specstory version
 specstory check
 ```
 
-The skills can be installed separately. Implement uses Claude for orchestration and independent review, and Codex for delegated workers; check its [model policy](#model-policy). Improve-workflow adds no fixed model requirement of its own.
+The skills can be installed separately. Implement can handle small changes directly in
+Claude; it needs Codex only when delegating to Codex workers. Improve-workflow can analyze
+existing records without launching workers and adds no fixed model requirement of its own.
 
 The skill installer only copies skill files. It does not install these programs, authenticate them, or start SpecStory.
 
@@ -45,7 +57,7 @@ These are separate interactive sessions; you do not need to open an extra Codex 
 specstory watch --no-cloud-sync
 ```
 
-SpecStory saves exported conversation history under `.specstory/history/`; `--no-cloud-sync` keeps the exports local. Check that relevant sessions appear there. Worker attempt and check records remain under `~/.claude/implement/`; launching the coordinator through SpecStory alone does not prove every worker was captured. See the [capture guide](../skills/improve-workflow/references/specstory.md) for existing sessions, worktrees, and capture limits, and the [official CLI reference](https://docs.specstory.com/integrations/terminal-coding-agents/usage) for launch options.
+SpecStory saves exported conversation history under `.specstory/history/`; `--no-cloud-sync` keeps the exports local. Check that relevant sessions appear there. Worker attempt and review records remain under `~/.claude/implement/`; specs live in the product repository under `specs/<slug>/`; launching the coordinator through SpecStory alone does not prove every worker was captured. See the [capture guide](../skills/improve-workflow/references/specstory.md) for existing sessions, worktrees, and capture limits, and the [official CLI reference](https://docs.specstory.com/integrations/terminal-coding-agents/usage) for launch options.
 
 ## Personal installation
 
@@ -72,14 +84,21 @@ This makes the skill part of that project's skill directory. Review before commi
 
 ## Model policy
 
-This policy applies to **implement**. It is the author's working model configuration, not a promise that every account exposes the same IDs:
+Implement's [model-policy.json](../skills/implement/model-policy.json) is the single source
+for the worker allowlist, default worker/effort, independent reviewer, and capability
+fallback. These are the author's configuration, not a promise of account access.
 
-- Codex worker allowlist: `gpt-5.6-luna`, `gpt-5.6-terra`, `gpt-5.6-sol`.
-- Independent final reviewer: Claude Opus through Claude Code's native agent interface.
-- Capability fallback: local Claude Sonnet when it can perform an authorized check that the Codex sandbox cannot.
-- Astra is excluded by the shipped policy.
+`IMPLEMENT_MODEL` and `IMPLEMENT_EFFORT` select a worker for a task. They do not bypass
+the allowlist or grant access. Resumes preserve saved settings unless explicitly overridden;
+changing a default does not change an existing worker's settings. Every launch rechecks
+the selected model against the current allowlist.
 
-`IMPLEMENT_MODEL` and `IMPLEMENT_EFFORT` select a worker within this policy; they do not bypass the allowlist or grant access. If your account lacks these models, adapt the policy explicitly before using the wrapper: update [model-routing.md](../skills/implement/references/model-routing.md), the corresponding statements in `SKILL.md`, and `allowed_models` in `scripts/codex_task.py`, then adjust and run its tests. Preserve your own explicit pins and budget. Do not silently substitute a different reviewer.
+For an explicitly authorized policy change, edit `model-policy.json` in the maintained
+skill source, run its tests, and reinstall. No Python change is needed. Preserve explicit
+user pins and budgets; do not substitute another reviewer silently. The wrapper enforces
+worker settings, while Claude must select the configured reviewer/fallback through its
+native interface. [Model routing](../skills/implement/references/model-routing.md) explains
+task selection and capability handoffs.
 
 An independently supplied review capability is necessary to complete this workflow. This collection does not bundle private review plugins, configure paid remote reviewers, or promise that a different host can dispatch Claude agents. Repository-required review integrations remain the repository's responsibility.
 

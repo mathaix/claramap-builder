@@ -1,4 +1,4 @@
-"""Exercise optional plan review and integrated review using real temporary Git repos."""
+"""Exercise recovery state and integrated review using real temporary Git repos."""
 import hashlib
 import json
 from pathlib import Path
@@ -10,7 +10,7 @@ import unittest
 SKILL = Path(__file__).resolve().parents[1]
 
 
-class AutonomyTools(unittest.TestCase):
+class ReviewAndRecovery(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -18,7 +18,6 @@ class AutonomyTools(unittest.TestCase):
         self.work = self.root / 'work'
         self.work.mkdir()
         self.run = self.root / 'run'
-        self.run.mkdir()
         self.git('init')
         self.git('config', 'user.email', 'test@example.invalid')
         self.git('config', 'user.name', 'Test')
@@ -49,68 +48,37 @@ class AutonomyTools(unittest.TestCase):
         saved = json.loads((review / 'snapshot.json').read_text())
         (review / 'verdict.md').write_text('VERDICT: APPROVE\nTREE: ' + saved['tree'] + '\n')
 
-    def test_legacy_runs_keep_plan_gate_and_existing_evidence(self):
+    def test_recovery_creates_run_dir_and_preserves_existing_keys(self):
+        (self.run / 'nested').mkdir(parents=True)
         (self.run / 'recovery.json').write_text(json.dumps({
-            'completed': {'T00': self.base}, 'evidence': ['unchanged-report.md']}))
+            'completed': {'T00': self.base}, 'evidence': ['unchanged-report.md'],
+            'plan_ready': True, 'execution_ready': True, 'plan_approvals': [{'review': 'review-1'}],
+            'plan_review_required': False, 'plan_review_decision': {'policy': 'not-required'}}))
         state = self.read_ok(self.recovery())
-        self.assertTrue(state['plan_review_required'])
-        self.assertFalse(state['plan_ready'])
-        self.assertFalse(state['execution_ready'])
-        self.assertIsNone(state['plan_review_decision'])
+        for stale in ('plan_ready', 'execution_ready', 'plan_approvals', 'plan_review_required', 'plan_review_decision'):
+            self.assertNotIn(stale, state)
+        self.assertNotIn('plan_ready', (self.run / 'recovery.json').read_text())
         self.assertEqual(state['completed'], {'T00': self.base})
         self.assertEqual(state['evidence'], ['unchanged-report.md'])
+        self.assertEqual(state['head'], self.base)
+        self.assertIn('Next action: implement', (self.run / 'recovery.md').read_text())
+        fresh = self.root / 'fresh'
+        self.read_ok(self.call('run_state.py', fresh, self.work, '--next-action', 'start'))
+        self.assertTrue((fresh / 'recovery.md').is_file())
 
-    def test_explicit_optional_plan_review_persists_without_fabricating_approval(self):
-        state = self.read_ok(self.recovery('--plan-review', 'not-required', '--reason', 'Routine scoped fix'))
-        self.assertFalse(state['plan_review_required'])
-        self.assertFalse(state['plan_ready'])
-        self.assertTrue(state['execution_ready'])
-        self.assertEqual(state['plan_approvals'], [])
-        self.assertIn('does not establish authorization, final review, check success', state['note'])
-        refreshed = self.read_ok(self.recovery())
-        self.assertEqual(refreshed['plan_review_decision'], state['plan_review_decision'])
-        self.assertEqual(refreshed['plan_review_decisions'], state['plan_review_decisions'])
-        self.assertTrue(refreshed['execution_ready'])
-        self.assertFalse(list(self.run.glob('review-*')))
-
-    def test_new_and_changed_decisions_need_reason_and_keep_history(self):
-        for policy in ('required', 'not-required'):
-            result = self.recovery('--plan-review', policy)
-            self.assertNotEqual(result.returncode, 0)
-            self.assertIn('requires a nonempty --reason', result.stderr)
-        self.read_ok(self.recovery('--plan-review', 'not-required', '--reason', 'Small known fix'))
-        original = (self.run / 'recovery.json').read_bytes()
-        for args in [('--plan-review', 'required'),
-                     ('--plan-review', 'required', '--reason', '  '), ('--reason', 'orphan reason')]:
-            self.assertNotEqual(self.recovery(*args).returncode, 0)
-            self.assertEqual((self.run / 'recovery.json').read_bytes(), original)
-        state = self.read_ok(self.recovery('--plan-review', 'required', '--reason', 'Scope grew into a redesign'))
-        self.assertTrue(state['plan_review_required'])
-        self.assertFalse(state['execution_ready'])
-        self.assertEqual([item['policy'] for item in state['plan_review_decisions']],
-                         ['not-required', 'required'])
-        # Reasserting the same recorded policy doesn't need a fresh justification.
-        self.assertEqual(len(self.read_ok(self.recovery('--plan-review', 'required'))['plan_review_decisions']), 2)
-
-    def test_required_plan_review_still_checks_artifact_drift(self):
-        for name in ('spec.md', 'plan.md', 'tasks.md'):
-            (self.run / name).write_text(name)
-        state = self.read_ok(self.recovery('--plan-review', 'required', '--reason', 'Unresolved design'))
-        self.assertFalse(state['execution_ready'])
-        review = self.run / 'review-plan'
-        saved = self.read_ok(self.call('review_gate.py', 'plan-snapshot', self.run, review))
-        (review / 'verdict.md').write_text('VERDICT: APPROVE\nARTIFACT: ' + saved['artifact'] + '\n')
+    def test_recovery_discovers_arbitrary_and_nested_worker_names(self):
+        for name in ('diagnosis', 'checks/database'):
+            worker = self.run / name
+            worker.mkdir(parents=True)
+            (worker / 'workdir').write_text(str(self.work))
+            (worker / 'events-1.jsonl').write_text('')
+            (worker / 'attempt-1.json').write_text('{"wrapper_exit_code": 0}')
+        (self.run / 'task-legacy').mkdir()
         state = self.read_ok(self.recovery())
-        self.assertTrue(state['plan_ready'])
-        self.assertTrue(state['execution_ready'])
-        (self.run / 'tasks.md').write_text('changed')
-        state = self.read_ok(self.recovery())
-        self.assertFalse(state['execution_ready'])
-        self.assertEqual(state['plan_approvals'][0]['changed_files'], ['tasks.md'])
-        state = self.read_ok(self.recovery('--plan-review', 'not-required', '--reason', 'Routine command amendment'))
-        self.assertFalse(state['plan_ready'])
-        self.assertTrue(state['execution_ready'])
-        self.assertEqual(state['plan_approvals'][0]['changed_files'], ['tasks.md'])
+        self.assertEqual(state['workers'], {
+            'diagnosis': 'exited_pending_verification',
+            'checks/database': 'exited_pending_verification',
+            'task-legacy': 'legacy_or_not_started'})
 
     def test_completed_commit_ancestry_is_enforced_and_not_erased(self):
         self.git('checkout', '-b', 'unrelated')
@@ -118,9 +86,10 @@ class AutonomyTools(unittest.TestCase):
         self.commit('other')
         other = self.git('rev-parse', 'HEAD')
         self.git('checkout', '--detach', self.base)
+        self.run.mkdir()
         (self.run / 'recovery.json').write_text(json.dumps({'completed': {'T01': other}}))
         before = (self.run / 'recovery.json').read_bytes()
-        result = self.recovery('--plan-review', 'not-required', '--reason', 'Routine')
+        result = self.recovery()
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual((self.run / 'recovery.json').read_bytes(), before)
 

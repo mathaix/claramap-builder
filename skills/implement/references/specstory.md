@@ -10,5 +10,5 @@ how work runs; implement continues to execute product development tasks.
 See the [diagram and SpecStory capture guide](https://github.com/mathaix/skills/blob/main/skills/improve-workflow/references/specstory.md#the-workflow-improvement-loop).
 The guide covers installation, local capture, worktrees, timing comparisons, and privacy.
 
-Keep execution evidence in the implementation run folder. This workflow requires installed SpecStory, Claude Code, and Codex, with session capture enabled.
+Keep specs in the product repository under `specs/<slug>/` and execution evidence in the run folder. Use SpecStory capture for Claude coordinator sessions and any delegated Codex sessions. Codex CLI is needed when launching those workers.
 Historical transcripts do not override current code, owner decisions, or permissions.

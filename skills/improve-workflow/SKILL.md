@@ -15,9 +15,9 @@ The companion [implement skill](https://github.com/mathaix/skills/tree/main/skil
 coordinates product development. Improve-workflow studies the evidence left by that
 work and helps improve the orchestration instructions, agent assignments, helper tools,
 and verification strategy. It can also analyze other workflows with equivalent records;
-implement itself can be installed separately. This setup requires SpecStory CLI, Claude
-Code, and Codex CLI installed, with Claude and Codex authenticated and their sessions
-captured through SpecStory. See the [capture guide](references/specstory.md) for launch
+implement itself can be installed separately. Run this skill in authenticated Claude
+Code with SpecStory capture. Codex CLI is needed only when launching Codex workers;
+reading existing evidence does not require it. See the [capture guide](references/specstory.md) for launch
 and background-capture commands. If historical capture is missing, report that evidence
 gap and analyze what is available.
 
@@ -70,7 +70,7 @@ Do not load every transcript or replay every check by default.
 
 | Evidence | What to learn from it | Limit |
 | --- | --- | --- |
-| `status.md`, plans, task briefs | Intended scope, decisions, assigned work, reported outcomes | Summaries can be stale or approximate |
+| `specs/<slug>/` in the product repo, task briefs | Intended scope, decisions, assigned work, reported outcomes | Summaries can be stale or approximate |
 | `recovery.json` and current Git state | Observed revision, workers, next action, unfinished work | A saved snapshot is not a live monitor |
 | `attempt-*.json` and worker events | Actual execution intervals, exits, retries, usage | Worker success alone is not acceptance |
 | Check records and logs | Commands, input fingerprints, environment, durations, failures | Coverage is limited to declared inputs and exercised behavior |

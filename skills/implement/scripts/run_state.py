@@ -3,10 +3,8 @@
 import argparse
 from datetime import datetime, timezone
 import fcntl
-import hashlib
 import json
 from pathlib import Path
-import re
 import subprocess
 import sys
 
@@ -37,63 +35,34 @@ def worker_state(directory):
     return 'exited_pending_verification' if record.get('wrapper_exit_code') == 0 else 'interrupted_or_failed'
 
 
-def plan_policy(previous, policy, reason):
-    decision = previous.get('plan_review_decision')
-    history = list(previous.get('plan_review_decisions', []))
-    if reason is not None and policy is None:
-        raise ValueError('--reason requires --plan-review')
-    if policy is not None:
-        new_choice = decision is None or decision['policy'] != policy
-        if (new_choice or reason is not None) and not (reason and reason.strip()):
-            raise ValueError('a new or changed --plan-review decision requires a nonempty --reason')
-        if new_choice or reason is not None:
-            decision = {'policy': policy, 'reason': reason.strip(),
-                        'decided_at': datetime.now(timezone.utc).isoformat()}
-            history.append(decision)
-    # Existing runs keep their approval requirement until an explicit decision is recorded.
-    required = decision is None or decision['policy'] == 'required'
-    return required, decision, history
-
-
-def refresh(run, worktree, next_action, completed, plan_review=None, reason=None):
+def refresh(run, worktree, next_action, completed):
+    run.mkdir(parents=True, exist_ok=True)
     path = run / 'recovery.json'
     previous = json.loads(path.read_text()) if path.exists() else {}
-    required, decision, decisions = plan_policy(previous, plan_review, reason)
+    # Plan-approval fields from the retired hash gate are never recalculated; drop them.
+    previous = {k: v for k, v in previous.items() if not k.startswith('plan_') and k != 'execution_ready'}
     commits = dict(previous.get('completed', {}))
     for entry in completed:
         task, sha = entry.split('=', 1)
         commits[task] = git(worktree, 'rev-parse', '--verify', sha + '^{commit}')
     for task, sha in commits.items():
         subprocess.run(['git', '-C', str(worktree), 'merge-base', '--is-ancestor', sha, 'HEAD'], check=True)
-    tasks = {p.name: worker_state(p) for p in sorted(run.glob('task-*')) if p.is_dir()}
-    approved = []
-    for snapshot in run.glob('review-*/plan-snapshot.json'):
-        verdict = snapshot.with_name('verdict.md')
-        saved = json.loads(snapshot.read_text())
-        text = verdict.read_text() if verdict.exists() else ''
-        if re.findall(r'^VERDICT: (\w+)\s*$', text, re.M) == ['APPROVE'] and re.findall(
-                r'^ARTIFACT: ([0-9a-f]+)\s*$', text, re.M) == [saved['artifact']]:
-            changed = [name for name, sha in saved['files'].items()
-                       if not (run / name).exists() or hashlib.sha256((run / name).read_bytes()).hexdigest() != sha]
-            approved.append({'review': snapshot.parent.name, 'artifact': saved['artifact'], 'changed_files': changed})
-    matching = [p for p in approved if not p['changed_files']]
+    # The wrapper accepts nested slugs with arbitrary names. Its workdir file
+    # identifies workers; retain discovery of old task-* directories as well.
+    directories = {p.parent for p in run.rglob('workdir') if p.is_file()}
+    directories.update(p for p in run.glob('task-*') if p.is_dir())
+    tasks = {str(p.relative_to(run)): worker_state(p) for p in sorted(directories)}
     state = {**previous, 'observed_at': datetime.now(timezone.utc).isoformat(), 'worktree': str(worktree),
              'head': git(worktree, 'rev-parse', 'HEAD'), 'branch': git(worktree, 'branch', '--show-current'),
              'git_status': git(worktree, 'status', '--porcelain=v1', '--untracked-files=all').splitlines(),
-             'completed': commits, 'workers': tasks, 'plan_approvals': approved,
-             'plan_ready': bool(matching), 'plan_review_required': required,
-             'plan_review_decision': decision, 'plan_review_decisions': decisions,
-             'execution_ready': not required or bool(matching), 'next_action': next_action,
-             'note': 'Observed snapshot, not a live monitor. Execution ready concerns only the plan-review '
-                     'requirement; it does not establish authorization, final review, check success, or readiness '
-                     'to land. Worker exit does not imply review or check success.'}
+             'completed': commits, 'workers': tasks, 'next_action': next_action,
+             'note': 'Observed snapshot, not a live monitor. Worker exit does not imply review or check success.'}
     tmp = path.with_suffix('.json.tmp')
     tmp.write_text(json.dumps(state, indent=2) + '\n')
     tmp.replace(path)
     text = ['# Current recovery state', '', f"Observed: {state['observed_at']}",
             f"Worktree: `{worktree}`", f"Branch / HEAD: `{state['branch']}` / `{state['head']}`",
-            f"Plan review required: {required}", f"Matching plan approval: {state['plan_ready']}",
-            f"Execution ready (plan review only): {state['execution_ready']}", '', 'Next action: ' + next_action, '',
+            '', 'Next action: ' + next_action, '',
             'Completed commits: ' + (', '.join(f'{k}={v[:12]}' for k, v in commits.items()) or 'none recorded'), '',
             '| Worker | Observed state |', '| --- | --- |']
     text += [f'| {k} | {v} |' for k, v in tasks.items()]
@@ -108,13 +77,9 @@ if __name__ == '__main__':
     parser.add_argument('worktree', type=Path)
     parser.add_argument('--next-action', required=True)
     parser.add_argument('--completed', action='append', default=[], metavar='TASK=COMMIT')
-    parser.add_argument('--plan-review', choices=('required', 'not-required'),
-                        help='record the coordinator decision; existing runs default to required')
-    parser.add_argument('--reason', help='required for a new or changed plan-review decision')
     args = parser.parse_args()
     try:
-        refresh(args.run.resolve(), args.worktree.resolve(), args.next_action, args.completed,
-                args.plan_review, args.reason)
+        refresh(args.run.resolve(), args.worktree.resolve(), args.next_action, args.completed)
     except (ValueError, OSError, subprocess.CalledProcessError) as exc:
         print(f'run_state: {exc}', file=sys.stderr)
         sys.exit(2)

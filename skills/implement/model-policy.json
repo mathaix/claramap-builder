@@ -1,0 +1,7 @@
+{
+  "allowed_models": ["gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol"],
+  "default_model": "gpt-5.6-luna",
+  "default_effort": "medium",
+  "reviewer": "Claude Opus",
+  "capability_fallback": "Claude Sonnet"
+}

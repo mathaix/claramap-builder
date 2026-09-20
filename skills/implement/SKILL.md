@@ -1,239 +1,112 @@
 ---
 name: implement
-description: "Take a feature, fix, or PR from request to checked, independently reviewed code. A capable Claude coordinator gives scoped work and context to Codex agents chosen for each task. Use for /implement and implementation requests."
+description: "Take a feature, fix, or PR from request to checked, independently reviewed code. Claude coordinates direct work or scoped Codex workers. Use for /implement and implementation requests."
 ---
 
-# Implement — from request to reviewed code
+# Implement
 
-![A goal flows through a Claude coordinator and task-specific workers into one verified result](assets/implement-workflow.png)
-
-Give Claude a feature, bug, or unfinished PR. Implement helps it deliver an integrated
-code change, evidence that the requested behavior works, and an independent final
-review. You set the goal and constraints; Claude reports what changed, what passed,
-and what remains open.
-
-The design puts a high-capability Claude session in charge of the whole goal. It breaks
-larger work into bounded tasks and gives Codex workers focused briefs: the expected
-result, relevant code and revision, permitted actions, and assigned checks. Claude
-chooses a worker model for each task, aiming to use faster, lower-cost options for
-clear work and stronger ones when uncertainty warrants them. Native Claude agents
-provide supported local fallbacks and independent review. Claude can handle a small
-change itself; it integrates and verifies delegated results before accepting them.
-
-## How a run works
-
-```mermaid
-flowchart TD
-    A["Feature, fix, or PR"] --> B["Claude coordinator<br/>goal and acceptance criteria"]
-    B --> C{"Delegate scoped work?"}
-    C -- "No" --> D["Claude works directly"]
-    C -- "Yes" --> E["Task brief<br/>specific context and checks"]
-    E --> F["Codex worker<br/>model matched to task"]
-    F --> G["Worker result and evidence"]
-    D --> H["Claude integrates and validates"]
-    G --> H
-    H --> I{"Behavior checks pass?"}
-    I -- "No" --> B
-    I -- "Yes" --> J["Independent Claude Opus review"]
-    J --> K{"Blocking findings?"}
-    K -- "Yes" --> B
-    K -- "No" --> L["Reviewed change<br/>evidence and open risks"]
-```
-
-1. **Frame the result.** Claude reads the request and code, then records what success
-   looks like. Larger tasks may use optional planning documents adapted from
-   [SpecFlow concepts](references/specflow.md).
-2. **Assign focused work.** Claude handles tasks directly or sends a brief with the
-   specific context each Codex or native Claude agent needs. It matches worker model
-   and capability to the task.
-3. **Check the result.** Claude integrates the work, runs checks against the requested
-   behavior, and tests the real user journey where needed. Run records preserve useful
-   evidence and progress across sessions.
-4. **Review and report.** An independent Claude Opus agent reviews the final change.
-   Claude resolves blocking findings and reports the outcome, evidence, and open risks.
-
-The bundled tools support worker dispatch, check records, exact-content review, and
-recovery. The roles and scripts below explain how to carry out each step.
-
-Implementation reports are kept under `~/.claude/implement/`. Use the separate
-[improve-workflow skill](https://github.com/mathaix/skills/tree/main/skills/improve-workflow)
-to review those reports alongside SpecStory history and improve how development
-is coordinated. This skill remains responsible for executing the development task.
-
-This setup assumes SpecStory CLI, Claude Code, and Codex CLI are installed, with Claude
-and Codex authenticated. Start interactive sessions through `specstory run claude --no-cloud-sync`
-or `specstory run codex --no-cloud-sync` from the product worktree. For delegated workers,
-keep SpecStory background capture running as described in the [capture guide](references/specstory.md).
-
-Invoke the skill in the Claude session with a concrete outcome:
-
-```text
-/implement Fix the input-save bug, reproduce it locally, and verify the affected journey.
-```
-
-## Agent roles and how they run
-
-| Role | What the coordinator delegates | Execution |
-| --- | --- | --- |
-| Coding | Implement a scoped change and run its focused checks | Codex worker or a capable native agent, following the model policy |
-| Diagnosis | Reproduce a bug, inspect callers, and establish its cause | A bounded investigation agent with source and reproduction access |
-| Verification | Test specific failure conditions on a known revision; retain reusable results | A worker assigned checks in an isolated copy or authorized environment |
-| QA | Exercise the actual user journey and report expected versus observed behavior | A capable agent using the project's local services, browser, or integration tools |
-| Independent review | Review the integrated diff, affected behavior, and evidence | A separate Claude Opus agent through the host's native agent interface |
-
-These roles are assigned in a brief; they are not five compulsory stages or five separate
-installed agent packages. The coordinator chooses the useful roles for each task.
-[Delegation and example dispatch commands](references/delegation.md) explain isolation,
-write boundaries, inputs, and expected results; use the [brief template](assets/templates/brief.md).
-
-Codex agents launch through [codex_task.sh](codex_task.sh), backed by
-[codex_task.py](scripts/codex_task.py). The wrapper invokes the installed Codex CLI and
-records prompts, sessions, attempts, results, and usage. Native Claude agents use the
-host's available agent tool. The current policy permits Codex Luna/Terra/Sol workers,
-requires independent Opus final review, and uses local Sonnet for capability restrictions;
-Astra is excluded. Read [model selection and fallback rules](references/model-routing.md)
-before dispatch. A role assignment does not supply missing model access, browser tools,
-credentials, or permissions.
-
-## Bundled tools
-
-Paths are relative to this installed skill directory. Run Python helpers with `python3`;
-use the linked references for full commands and when to use each tool.
-
-| Tool | What it gives the orchestrator | Guide |
-| --- | --- | --- |
-| [codex_task.sh](codex_task.sh) / [codex_task.py](scripts/codex_task.py) | `run`, `resume`, and `cost`; worker locks, saved attempts, and observed usage | [Delegation](references/delegation.md) |
-| [scaffold.py](scripts/scaffold.py) | A compact run record, or expanded planning templates when useful | [Execution](references/execution.md) |
-| [check_evidence.py](scripts/check_evidence.py) | Execute a check, record its inputs/result, and determine whether evidence can be reused | [Verification](references/verification.md) |
-| [review_gate.py](scripts/review_gate.py) | Capture the complete integrated diff and verify approval of the exact content | [Code review](references/code-review.md) |
-| [review_copy.py](scripts/review_copy.py) | Export the reviewed source or baseline for isolated checks | [Execution](references/execution.md) |
-| [run_state.py](scripts/run_state.py) | Observe Git/worker state, planning policy, completed commits, and next action | [Recovery](references/recovery.md) |
-
-Product changes stay in the product worktree. Operational evidence normally stays in
-`~/.claude/implement/<repo>-<slug>/`. [SpecStory history](references/specstory.md)
-adds conversation context for recovery and workflow improvement. Read the relevant
-reference when needed; the coordinator does not need to load every reference up front.
-
-## Coordinator authority
-
-The coordinator owns the outcome and chooses the route: implement directly or delegate,
-group and order tasks, select tests, reuse evidence, and decide when intermediate review
-adds value. Optimize for a correct, reviewable result with minimal elapsed time. Routine
-implementation choices do not require owner approval.
-
-Preserve the owner's acceptance criteria, explicit decisions, model pins, budgets, data
-boundaries, and permissions. Required repository/CI checks and independent final review
-remain mandatory. Do not mark skipped or failed checks as passes. Escalate consequential
-product/architecture choices outside accepted scope, missing authorization, or serious
-unresolved risks; keep independent work moving.
+Deliver the requested change, proof that its requirements are met, and an independent
+final review. Claude coordinates; the bundled scripts help with workers, review snapshots,
+and recovery. Nothing runs automatically. A small, settled task can be implemented directly.
 
 ## Establish the outcome
 
-Recover the target, existing run, Git state, and relevant repository rules before asking
-questions. Read current code and evidence; transcripts are history, not new authorization.
-Use an isolated checkout for unrelated edits or concurrent writers. Verify critical
-premises (callers, schemas, roles, dependencies) before handing work off.
+Inspect the request, relevant code, repository rules, Git state, and any existing spec or
+run before asking questions. Verify critical premises (callers, schemas, dependencies)
+before delegating. Preserve owner decisions, model pins, budgets, data boundaries, and
+permissions. Transcripts are history, not authorization.
 
-Keep personal run records at `~/.claude/implement/<repo>-<slug>/`, outside the product repo.
-Start with `scripts/scaffold.py <run-dir> --compact --title "<outcome>"`: one status file
-with acceptance criteria, decisions, evidence, and next action. Link an existing spec
-instead of copying it. Add spec/plan/tasks documents only when they clarify significant
-scope or dependencies; scaffold without `--compact` retains the expanded templates.
-Never overwrite existing runs, decisions, evidence, or review verdicts.
+Product knowledge lives in the repository. For anything beyond a small, settled change:
 
-The coordinator decides whether separate design review is needed. Use it for unresolved
-consequential design questions, competing contracts, or an owner/repository requirement.
-A migration, auth fix, or concurrency change warrants stronger evidence, but does not
-by itself require another planning ceremony when the design is settled. Record the
-choice and short reason with `scripts/run_state.py --plan-review required|not-required
---reason "..."` (see [execution.md](references/execution.md)). Routine changes to commands,
-paths, test selection, task order, or implementation detail do not need plan approval.
-Revisit affected design when evidence changes a material premise.
+```sh
+python3 <skill>/scripts/scaffold.py <worktree> <slug> --title "<outcome>"
+```
 
-Existing runs may adopt this owner-authorized workflow explicitly, preserving open
-findings and evidence. Changing workflow never resolves a finding or overrides a
-separate owner-mandated design approval. `plan_ready` records actual matching approval;
-`execution_ready` reflects the separate coordinator decision about needing that gate.
+This creates `specs/<slug>/` with `requirements.md` (EARS statements, WHEN ... THE SYSTEM
+SHALL ..., each with its proof), `design.md` (approach, decisions, open questions,
+design-review status), and `tasks.md` (checkboxes citing requirement IDs, each naming
+files, check, and executor). Fill them from what you inspected; link existing specs
+instead of copying. They are committed and reviewed with the code. See
+[spec format](references/spec-format.md).
 
-## Choose the people and checks
+Operational residue lives outside the repository at `~/.claude/implement/<repo>-<slug>/`:
+worker records, review snapshots, verdicts, and `recovery.json`. Never commit those.
 
-Delegate when it saves elapsed time or supplies independent expertise. Combine related
-changes; a small fix can be done by the coordinator with no coding agent. Use the roles,
-model policy, and linked tools above; do not invent unavailable capabilities or silently
-substitute a pinned model.
+Separate design review is optional. Require it when the owner or repository does, or when
+a consequential design question is still open. Record the choice and reason under
+"Design review" in `design.md`. Approval names a commit; drift is `git diff`. See
+[design review](references/plan-review.md).
 
-For each changed behavior, identify what could break and choose the smallest checks
-that meaningfully detect it. Include affected callers and shared contracts when relevant.
-Database writers need real database evidence under the intended role. End-to-end QA
-is appropriate when the journey crosses services/UI or acceptance requires it. Mocked
-unit tests prove their modeled behavior, not production integration.
+## Execute and verify
 
-Assign each check one executor. Use [verification.md](references/verification.md) and
-`scripts/check_evidence.py` to capture commands, inputs, environment, results, and timing.
-Accept valid evidence from another agent. Repeat only for changed relevant inputs,
-changed environment, an interrupted/failed check, or a new concrete concern; record
-why. Run required full checks on the integrated change, not automatically after each
-task. Cheap relevant checks should fail early. Reviewers investigate distinct concerns
-instead of replaying evidenced suites.
+Choose direct work or delegation, task grouping, and check depth to deliver a correct
+result in minimal elapsed time. Routine choices within scope need no approval. Escalate
+consequential choices outside scope, missing authorization, or serious unresolved risk,
+and keep independent work moving.
 
-Parallelize independent coding in isolated worktrees, verification on fixed snapshots,
-and environment preparation when resources permit. Serialize shared writers, staging,
-and shared database mutations. On confirmed capability denial, preserve partial work
-and hand remaining checks to a capable authorized executor; do not emulate system
-tools, weaken tests, or keep retrying the same broken environment.
+Before dispatch read [model routing](references/model-routing.md) and
+[model-policy.json](model-policy.json). Pins are binding; never silently substitute a
+model. Brief workers with [delegation](references/delegation.md) and the
+[brief template](assets/templates/brief.md). Roles are tools, not compulsory stages, and
+a role grants no capability or permission.
 
-## Integrate and review
+No two writers share a worktree. Serialize shared database mutations. Integrate delegated
+work before final verification. On a confirmed capability denial, keep partial work and
+use the policy's fallback; do not retry the denied command, fake tools, or weaken checks.
 
-The coordinator can fix findings directly, revise briefs, and combine repair batches.
-Intermediate reviews are optional. Keep unresolved correctness findings visible;
-resolve P0/P1 before completion. The coordinator can fix or defer lower-priority issues
-with a concrete rationale and impact, subject to stricter repository rules. Preferences
-and speculative scope additions do not block delivery. After repeated failed repairs,
-reassess the approach rather than cycling models or review rounds mechanically.
+Pick checks from plausible failures and the proofs in `requirements.md`, including affected
+callers and shared contracts; see [verification](references/verification.md). Database
+writers need real database evidence under the intended role. UI or cross-service journeys
+need real QA. Mocks prove modeled behavior only. Run repository-required checks on the
+integrated result. Tick a task in `tasks.md` only once its check has passed; record the
+command and log path there or in `recovery.json`. Unproven work stays open.
 
-Require one independent review of the integrated change before publishing/landing.
-A repository-required final `/code-review` can satisfy this requirement: do not add
-another equivalent whole-branch review. Keep separately required CI/remote review gates.
-Local checkpoint commits may precede final review unless repository rules prohibit it.
-Use `review_gate.py snapshot <worktree> <review-dir> --base <base-commit>` to capture the
-complete integrated diff, including committed and staged work. Give the reviewer the
-exported copy, criteria, known findings, and existing check evidence. See
-[code-review.md](references/code-review.md) and [execution.md](references/execution.md).
+## Review the integrated result
 
-Review approval must name the exact final tree. If content changes, request a focused
-review of the delta and affected interactions; carry forward the prior full review
-rather than restart it. Never reuse an approval for unreviewed content. The deterministic
-gate validates content and verdict, not test success. Verify both before publishing.
-When a separate design review is selected, use [plan-review.md](references/plan-review.md);
-strict plan snapshots remain available for that purpose, not universal dispatch gates.
+Independent final review is required before publishing or landing. Use the policy's
+reviewer through the host's native agent interface; the Codex wrapper cannot launch
+Claude. Report a missing capability rather than self-reviewing. An equivalent independent
+repository review may satisfy this; keep mandated CI and remote gates.
 
-## Finish and recover
+```sh
+git add -- <changed paths> specs/<slug>
+python3 <skill>/scripts/review_gate.py snapshot <worktree> <review-dir> --base <base-commit>
+python3 <skill>/scripts/review_copy.py <review-dir>/snapshot.json <temp-copy>
+# Reviewer gets the copy, diff, specs, known findings, and check evidence.
+# Save its exact reply as <review-dir>/verdict.md, then:
+python3 <skill>/scripts/review_gate.py verify <worktree> <review-dir>
+```
 
-Record acceptance results, remaining risks, and a concrete next action. Refresh
-`recovery.json`/`recovery.md` at meaningful transitions using `scripts/run_state.py`;
-[recovery.md](references/recovery.md) covers interrupted workers and stale state.
-Keep records concise. Use wrapper/check timestamps; distinguish active work, review,
-environment failures, and owner/queue waits. Overlapping intervals are not additive.
-During long work, send a useful update within 60 seconds; do not dump transcripts.
+Follow [code review](references/code-review.md). Resolve P0/P1 before completion. Defer
+lower findings only with rationale recorded in `tasks.md`. Approval names the exact tree;
+changed content needs a delta review naming the new tree. The gate checks content and
+verdict identity only. You verify reviewer independence, dispositions, and test results.
 
-Continue already-authorized Git/PR actions after refreshing current state. Sending
-messages/comments and deploying retain their normal authorization requirements.
-Do not add a permission stop for routine choices within the accepted task.
+## Finish or recover
 
-Report delivered behavior, evidence, limitations, and observed usage where available.
-`codex_task.sh cost <repo>-<slug>` deduplicates session-cumulative worker counters;
-reviewer counters also need per-agent deduplication. Unknown usage stays unknown;
-tokens are not billed dollars. No paid model calls are needed to test these helpers.
+Refresh `recovery.json` at transitions with
+`run_state.py <run-dir> <worktree> --next-action "..."`; it is an observed snapshot, not
+a monitor. Read [recovery](references/recovery.md) before resuming: a stopped conversation
+does not mean its worker stopped. Send a useful update within 60 seconds during long work.
+After the final review passes, run `python3 <skill>/scripts/usage.py --run <run-dir>`.
+It detects the current Claude session, sums tokens per model across Codex workers, the
+coordinator, and subagents, prints the table, and saves it as `<run-dir>/usage.md`.
+Include that table in the final response. Tokens are not dollars.
 
-Validate changes to this skill with `python3 -m unittest discover -s <skill>/tests -v`.
-Use the external skill-creator validator when available; it is not a runtime dependency.
-Test observable helper behavior, not matching prose.
+## Tools
 
-## Installation and session history
+| Need | Tool or reference |
+| --- | --- |
+| Create `specs/<slug>/` | `scripts/scaffold.py`; [spec format](references/spec-format.md) |
+| Start/resume workers, inspect usage | `codex_task.sh run` / `resume` / `cost`; [delegation](references/delegation.md) |
+| Snapshot, export, verify a review | `review_gate.py`, `review_copy.py`; [execution](references/execution.md) |
+| Observe workers and Git | `run_state.py`; [recovery](references/recovery.md) |
+| Tokens per model across workers, coordinator, and subagents | `scripts/usage.py --run <run-dir>` (session auto-detected) |
+| See a complete small run | [Example](references/example-run.md) |
+| Capture conversations | [SpecStory](references/specstory.md) |
 
-This skill is published in [mathaix/skills](https://github.com/mathaix/skills), under
-`skills/implement/`. See [installation](https://github.com/mathaix/skills/blob/main/docs/installation.md)
-and the [implement guide](https://github.com/mathaix/skills/blob/main/docs/implement.md).
-To analyze runs and improve this workflow, use the [improve-workflow guide](https://github.com/mathaix/skills/blob/main/docs/improve-workflow.md). For
-session capture, recovery context, and timing audits, use
-[companion workflow-improvement guide](references/specstory.md). Keep real transcripts local.
+Paths are relative to the installed skill; run helpers with `python3`. SpecStory capture
+is required for coordinator and worker sessions. Validate helper changes with
+`python3 -m unittest discover -s <skill>/tests -v`. Use the separate
+[improve-workflow skill](https://github.com/mathaix/skills/tree/main/skills/improve-workflow)
+only when asked to analyze runs.

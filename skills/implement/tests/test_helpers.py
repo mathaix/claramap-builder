@@ -1,6 +1,7 @@
 import json
 import os
 import signal
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -109,7 +110,7 @@ class Helpers(unittest.TestCase):
         denied = self.worker('run', self.work, 'project/denied',
             env={**self.env, 'IMPLEMENT_MODEL': 'gpt-6-astra'})
         self.assertNotEqual(denied.returncode, 0)
-        self.assertIn('Astra is not permitted', denied.stderr)
+        self.assertIn('excluded by owner policy', denied.stderr)
         self.assertFalse((self.root / 'args.json').exists())
         self.assertEqual(self.worker('run', self.work, 'project/task-01').returncode, 0)
         state = self.root / 'runs/project/task-01'
@@ -135,6 +136,37 @@ class Helpers(unittest.TestCase):
         self.assertEqual(json.loads((state / 'attempt-1.json').read_text())['codex_exit_code'], 42)
         report = json.loads(self.worker('cost').stdout)
         self.assertEqual(report['unknown_attempts'], 1)
+
+    def test_policy_file_controls_defaults_allowlist_and_saved_resume(self):
+        installed = self.root / 'installed'
+        shutil.copytree(SKILL, installed)
+        path = installed / 'model-policy.json'
+        policy = json.loads(path.read_text())
+        policy.update(allowed_models=['test-worker', 'next-worker'],
+                      default_model='test-worker', default_effort='high')
+        path.write_text(json.dumps(policy))
+
+        def call(*args, env=None):
+            return subprocess.run([sys.executable, str(installed / 'scripts/codex_task.py'), *map(str, args)],
+                                  env=env or self.env, input='brief', text=True, capture_output=True)
+
+        result = call('run', self.work, 'custom/code')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        state = self.root / 'runs/custom/code'
+        self.assertEqual(json.loads((state / 'worker.json').read_text()),
+                         {'model': 'test-worker', 'effort': 'high'})
+        policy.update(default_model='next-worker', default_effort='low')
+        path.write_text(json.dumps(policy))
+        self.assertEqual(call('resume', 'custom/code').returncode, 0)
+        attempt = json.loads((state / 'attempt-2.json').read_text())
+        self.assertEqual((attempt['model'], attempt['effort']), ('test-worker', 'high'))
+        denied = call('resume', 'custom/code', env={**self.env, 'IMPLEMENT_MODEL': 'unlisted'})
+        self.assertNotEqual(denied.returncode, 0)
+        self.assertFalse((state / 'attempt-3.json').exists())
+        policy['allowed_models'] = []
+        path.write_text(json.dumps(policy))
+        self.assertNotEqual(call('run', self.work, 'custom/invalid').returncode, 0)
+        self.assertFalse((self.root / 'runs/custom/invalid/events-1.jsonl').exists())
 
     def test_large_prompt_startup_exit_preserved(self):
         result = subprocess.run([sys.executable, str(SKILL / 'scripts/codex_task.py'),
@@ -179,28 +211,6 @@ class Helpers(unittest.TestCase):
         result = self.worker('run', self.work, '../escape')
         self.assertNotEqual(result.returncode, 0)
         self.assertFalse((self.root / 'escape').exists())
-
-    def test_scaffold_refuses_overwrite(self):
-        dest = self.root / 'plan'
-        self.assertEqual(self.call('scaffold.py', dest, '--title', 'Example').returncode, 0)
-        (dest / 'spec.md').write_text('user edits')
-        self.assertNotEqual(self.call('scaffold.py', dest).returncode, 0)
-        self.assertEqual((dest / 'spec.md').read_text(), 'user edits')
-        self.assertEqual(len(list(dest.glob('*.md'))), 4)
-
-    def test_plan_approval_and_revision_gate(self):
-        run = self.root / 'plan'
-        self.call('scaffold.py', run)
-        review = run / 'review-1'
-        result = self.call('review_gate.py', 'plan-snapshot', run, review)
-        self.assertEqual(result.returncode, 0, result.stderr)
-        artifact = json.loads((review / 'plan-snapshot.json').read_text())['artifact']
-        (review / 'verdict.md').write_text('VERDICT: CHANGES\nARTIFACT: ' + artifact + '\n')
-        self.assertNotEqual(self.call('review_gate.py', 'plan-verify', run, review).returncode, 0)
-        (review / 'verdict.md').write_text('VERDICT: APPROVE\nARTIFACT: ' + artifact + '\n')
-        self.assertEqual(self.call('review_gate.py', 'plan-verify', run, review).returncode, 0)
-        (run / 'tasks.md').write_text('changed task')
-        self.assertNotEqual(self.call('review_gate.py', 'plan-verify', run, review).returncode, 0)
 
     def test_concurrent_resume_refused(self):
         self.assertEqual(self.worker('run', self.work, 'project/task-01').returncode, 0)
@@ -345,19 +355,13 @@ class Helpers(unittest.TestCase):
         self.assertEqual(self.call('review_copy.py', review / 'snapshot.json', baseline, '--baseline').returncode, 0)
         self.assertEqual((baseline / 'file').read_text(), 'one\n')
 
-    def test_recovery_observes_actual_head_dirty_tree_and_plan_drift(self):
+    def test_recovery_observes_actual_head_and_dirty_tree(self):
         self.prepare_repo()
-        run = self.root / 'plan'
-        self.call('scaffold.py', run)
-        review = run / 'review-1'
-        self.call('review_gate.py', 'plan-snapshot', run, review)
-        artifact = json.loads((review / 'plan-snapshot.json').read_text())['artifact']
-        (review / 'verdict.md').write_text('VERDICT: APPROVE\nARTIFACT: ' + artifact + '\n')
+        run = self.root / 'run'
         args = ('run_state.py', run, self.work, '--next-action', 'inspect partial changes', '--completed', 'T00=HEAD')
         result = self.call(*args)
         self.assertEqual(result.returncode, 0, result.stderr)
         record = json.loads(result.stdout)
-        self.assertTrue(record['plan_ready'])
         self.assertEqual(record['head'], self.git('rev-parse', 'HEAD'))
         self.assertTrue(record['git_status'])
         (self.work / 'file').write_text('unstaged content')
@@ -365,8 +369,6 @@ class Helpers(unittest.TestCase):
         self.assertIn('MM file', current['git_status'])
         self.git('reset', '--', 'file')
         self.assertIn(' M file', json.loads(self.call(*args).stdout)['git_status'])
-        (run / 'tasks.md').write_text('amended requirements')
-        self.assertFalse(json.loads(self.call(*args).stdout)['plan_ready'])
         self.assertEqual(json.loads((run / 'recovery.json').read_text())['next_action'], 'inspect partial changes')
 
     def git(self, *args):

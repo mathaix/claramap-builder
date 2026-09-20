@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -35,7 +36,6 @@ def state(repo):
         name = raw.decode('utf-8', 'surrogateescape')
         path = repo / name
         if path.is_symlink():
-            import os
             content = b'symlink:' + os.fsencode(os.readlink(path))
         elif path.is_file():
             content = b'file:' + path.read_bytes()
@@ -110,34 +110,9 @@ def verify(repo, directory):
     print('APPROVED_UNCHANGED ' + saved['tree'])
 
 
-def plan_state(directory):
-    files = {name: digest((directory / name).read_bytes())
-             for name in ('spec.md', 'plan.md', 'tasks.md')}
-    return {'files': files, 'artifact': digest(json.dumps(files, sort_keys=True).encode())}
-
-
-def plan_snapshot(run, directory):
-    current = plan_state(run)
-    directory.mkdir(parents=True, exist_ok=False)
-    (directory / 'plan-snapshot.json').write_text(json.dumps(current, indent=2) + '\n')
-    print(json.dumps(current))
-
-
-def plan_verify(run, directory):
-    saved = json.loads((directory / 'plan-snapshot.json').read_text())
-    if plan_state(run) != saved:
-        raise ValueError('spec/plan/tasks changed since review')
-    verdict = (directory / 'verdict.md').read_text()
-    if re.findall(r'^VERDICT: (\w+)\s*$', verdict, re.M) != ['APPROVE']:
-        raise ValueError('plan reviewer has not approved')
-    if re.findall(r'^ARTIFACT: ([0-9a-f]+)\s*$', verdict, re.M) != [saved['artifact']]:
-        raise ValueError('approval does not name these plan artifacts')
-    print('APPROVED_UNCHANGED ' + saved['artifact'])
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=('snapshot', 'verify', 'plan-snapshot', 'plan-verify'))
+    parser.add_argument('mode', choices=('snapshot', 'verify'))
     parser.add_argument('worktree', type=Path)
     parser.add_argument('review_dir', type=Path)
     parser.add_argument('--base', help='snapshot: commit to compare with the staged tree (integrated review)')
@@ -146,10 +121,8 @@ def main():
         parser.error('--base is only valid with snapshot')
     if args.mode == 'snapshot':
         snapshot(args.worktree.resolve(), args.review_dir.resolve(), args.base)
-        return
-    operation = {'snapshot': snapshot, 'verify': verify,
-                 'plan-snapshot': plan_snapshot, 'plan-verify': plan_verify}[args.mode]
-    operation(args.worktree.resolve(), args.review_dir.resolve())
+    else:
+        verify(args.worktree.resolve(), args.review_dir.resolve())
 
 
 if __name__ == '__main__':

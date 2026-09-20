@@ -1,36 +1,38 @@
 # Optional design review
 
-Use when the coordinator selects separate design review or the owner/repository requires
-it. Routine implementation/test-command amendments do not automatically need this gate.
-Review the affected design question; these document templates are optional aids.
+Use only when selected: the owner or repository requires it, or a consequential design
+question is still open. Routine amendments to commands, paths, or test selection never
+need it. The reviewer is read-only: no edits, staging, fetching, or environment changes.
 
-Review the spec, roadmap and tasks against repository evidence. Read-only: do not
-edit source, stage, fetch, merge, rebase, or reset environments.
-
-Inputs: <REPO>, <SPEC>, <PLAN>, <TASKS>, their <PLAN_SNAPSHOT_JSON>, applicable repo rules,
-<BASE_SHA>, <HEAD_SHA>, and source evidence paths. Verify the file hashes and combined artifact in that manifest yourself.
+Inputs: repository path, `specs/<slug>/`, the commit SHA those specs are at, applicable
+repository rules, and the base SHA.
 
 Check:
-1. Intended behavior matches the user's target; every acceptance criterion has a task
-   and observable proof. Preserve settled decisions.
-2. Critical premises match actual code: base/conflicts, IDs/references, callers,
-   schema/runtime dependencies. Name evidence contradicting a brief.
-3. Tasks are coherent, independently verifiable, and dependency-ordered. A mechanical
-   rename may span many files; do not split just to satisfy an arbitrary file limit.
-4. Checks exist, distinguish success/failure, and run under the assigned executor's
-   permissions and environment. Identify allowed skips explicitly.
-5. Scope/actions comply with applicable repo and user constraints.
+1. Every requirement has a task and an observable proof; settled decisions are preserved.
+2. Premises match the code: base and conflicts, callers, schemas, runtime dependencies.
+3. Tasks are coherent, dependency-ordered, and independently checkable.
+4. Each check distinguishes success from failure and runs under its executor's permissions.
+5. Scope and actions comply with repository and user constraints.
 
-CHANGES is for concrete blocking defects. Wording preferences belong in SUGGESTIONS
-and do not prevent APPROVE. Do not introduce new scope.
+CHANGES is for concrete blocking defects. Preferences go in SUGGESTIONS. Add no scope.
 
+```text
 VERDICT: APPROVE | CHANGES
-ARTIFACT: <combined artifact hash from verified plan-snapshot.json>
+COMMIT: <sha of the reviewed specs>
 FINDINGS:
-- <ID> [severity] <task/criterion> — defect, source evidence, smallest required fix
+- <ID> [severity] <file:line or task> — defect, evidence, smallest required fix
 SUGGESTIONS:
 - <optional, or none>
+```
 
-For revisions, check previous findings and affected changes; repeat broader investigation
-only for a new reason. Record usage by agent ID with cumulative/per-call semantics.
-Approval applies only to these hashes.
+Save the reply as `<run-dir>/review-design/verdict.md` and record the commit and verdict
+path under "Design review" in `design.md`. Check drift against the working tree, not HEAD,
+so staged and unstaged edits and new files count:
+
+```sh
+git diff <sha> -- specs/<slug>/
+git ls-files --others --exclude-standard -- specs/<slug>/
+```
+
+Empty output from both means the approved specs are unchanged. A later spec change needs a
+fresh verdict only when its semantics changed; the coordinator judges that and records the reason.

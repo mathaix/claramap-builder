@@ -12,6 +12,13 @@ import sys
 import time
 
 
+def model_policy():
+    policy = json.loads((Path(__file__).resolve().parents[1] / 'model-policy.json').read_text())
+    if policy['default_model'] not in policy['allowed_models']:
+        raise ValueError('model-policy.json default_model must be one of allowed_models')
+    return policy
+
+
 def task_path(root, slug):
     parts = Path(slug).parts
     if not parts or Path(slug).is_absolute() or any(p in ('.', '..') for p in parts):
@@ -162,12 +169,13 @@ def execute_locked(directory, mode, lock_fd):
     if mode == 'resume' and (not model or not effort):
         raise ValueError('unknown original model/effort; inspect history and explicitly set '
                          'IMPLEMENT_MODEL and IMPLEMENT_EFFORT before resuming')
-    model = model or 'gpt-5.6-luna'
-    allowed_models = ('gpt-5.6-luna', 'gpt-5.6-terra', 'gpt-5.6-sol')
+    policy = model_policy()
+    model = model or policy['default_model']
+    allowed_models = policy['allowed_models']
     if model not in allowed_models:
         raise ValueError(f'worker model {model!r} is excluded by owner policy; '
-                         f'choose explicitly from {", ".join(allowed_models)}; Astra is not permitted')
-    effort = effort or 'medium'
+                         f'choose explicitly from {", ".join(allowed_models)} in model-policy.json')
+    effort = effort or policy['default_effort']
     sid = recover_session(directory)
     if mode == 'resume' and not sid:
         raise ValueError('no session.id; inspect the failed attempt and use a new task slug')
@@ -305,6 +313,6 @@ def main():
 if __name__ == '__main__':
     try:
         sys.exit(main())
-    except (ValueError, OSError) as exc:
+    except (ValueError, OSError, KeyError) as exc:
         print(f'codex_task: {exc}', file=sys.stderr)
         sys.exit(2)

@@ -6,7 +6,7 @@ Improve-workflow examines how code development ran: where time went, which work 
 
 ## Review a run
 
-With [Claude Code, Codex, and SpecStory installed](installation.md#requirements), open Claude Code through `specstory run claude --no-cloud-sync` in the product repository whose work you want to inspect. Identify the runs or time window and ask a concrete question:
+With [Claude Code and SpecStory set up](installation.md#requirements), open Claude Code through `specstory run claude --no-cloud-sync` in the product repository whose work you want to inspect. Reading existing evidence does not require launching Codex. Identify the runs or time window and ask a concrete question:
 
 ```text
 /improve-workflow Review the last three runs in ~/.claude/implement and this project's
