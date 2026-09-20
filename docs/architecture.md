@@ -41,6 +41,87 @@ while the helpers and coordinator retain execution records. Both feed
 sessions; improvements are applied only when requested. Completion requires passing
 checks and approved content. Missing permissions, capabilities, or proof stay explicit.
 
+## Where files live
+
+**Feature specs live in the repository you are building, under `specs/<slug>/`.**
+The Claramap Builder checkout contains reusable templates; the installed skill uses
+those templates to create specs in your product worktree. You do not put your
+product's feature specs in the Claramap Builder checkout or installed skill directory.
+
+For example, building a display-name setting in a project called `my-app` uses a
+feature slug such as `display-name`. The following is an illustrative layout;
+worker, check-log, and review directory names are chosen per run.
+
+```text
+~/claramap-builder/                     # Maintained source of Claramap Builder
+└── skills/implement/
+    ├── SKILL.md                        # Reusable agent instructions
+    └── assets/templates/               # Blank spec and worker-brief templates
+
+~/.claude/skills/implement/              # Installed copy loaded by Claude Code
+├── SKILL.md
+├── model-policy.json
+├── assets/templates/
+└── scripts/
+
+/path/to/my-app/                        # Your product repository / worktree
+├── specs/display-name/                 # Feature-specific specs; commit with code
+│   ├── requirements.md                 # Goal, constraints, acceptance criteria
+│   ├── design.md                       # Approach, decisions, design-review status
+│   └── tasks.md                        # Assignments, checks, progress, dispositions
+├── .specstory/history/                  # Local captured conversations
+└── ...                                 # Your product source and tests
+
+~/.claude/implement/my-app-display-name/ # Local execution evidence for this run
+├── task-01/                            # Example worker record directory
+│   ├── workdir                         # Path to the worker's actual code checkout
+│   ├── events-1.jsonl                  # Worker events
+│   └── attempt-1.json                  # Exit, timing, model, and observed usage
+├── checks/                             # Example location for saved check logs
+├── review-final/                       # Example review record directory
+│   ├── snapshot.json                   # Identity of the reviewed Git content
+│   ├── diff.patch                      # Change submitted for review
+│   └── verdict.md                      # Independent reviewer's response
+├── recovery.json                       # Observed state and next action
+└── recovery.md                         # Human-readable recovery summary
+```
+
+### What to commit
+
+| Files | Who creates or updates them | Git treatment |
+| --- | --- | --- |
+| `specs/<slug>/requirements.md`, `design.md`, `tasks.md` | The coordinator scaffolds and fills them, then maintains them as the work changes. | Commit and review with the product code. Link existing specifications rather than duplicating them. |
+| Worker records, check logs, review snapshots, and recovery files | The worker wrapper and review/recovery helpers create their records; the coordinator records checks and saves reviewer replies. | Keep in the local run folder outside the product worktree. |
+| `.specstory/history/` | SpecStory, when capture is running for that worktree. | Keep raw conversations local; exclude `.specstory/` through the product's ignore or local exclude rules. |
+| Installed skill files | `scripts/install.py` copies them from the maintained source. | Personal installations live outside the product repo. A project installation in `.claude/skills/` may be committed deliberately for the team. |
+
+For small, settled changes, a spec folder is optional. The request and commit message
+can carry the acceptance criteria. For larger changes, `tasks.md` is the place to
+look for remaining work; keep bulky logs in the run folder and reference their paths.
+
+### How the locations connect
+
+Use the same feature slug in the spec path and run name: `specs/display-name/` pairs
+with `my-app-display-name/`. This is a naming convention selected by the coordinator,
+not automatic discovery between the folders. Worker records can be nested below that
+run, such as `my-app-display-name/task-01`.
+
+A worker's record directory is separate from its code checkout. Parallel coding
+workers use isolated Git worktrees; the coordinator chooses their locations and
+integrates their changes into the product worktree. Capture conversations in each
+worktree that hosts relevant activity.
+
+`IMPLEMENT_ROOT` changes the wrapper's default `~/.claude/implement` root. Supply
+matching explicit paths to the review and recovery helpers. The scaffold helper
+always receives the target product worktree and feature slug. With a project skill
+installation, reusable skill files live in `<project>/.claude/skills/implement/`;
+feature specs still live in `<project>/specs/<slug>/`.
+
+To resume, start with the product's specs, current Git state, and the run's recovery
+records. Recovery files are snapshots, not live monitors; inspect worker locks and
+actual results before continuing. SpecStory supplies conversation context and does
+not by itself prove that a check passed or an interrupted worker stopped.
+
 ## Claude: coordinate, integrate, and review
 
 [Claude Code](https://github.com/anthropics/claude-code) hosts `/implement` and holds the full development goal. The coordinator
@@ -113,23 +194,6 @@ execution still uses the configured providers. See the
 [SpecStory CLI reference](https://docs.specstory.com/integrations/terminal-coding-agents/usage)
 and the [detailed capture guide](../skills/improve-workflow/references/specstory.md)
 for existing-session exports, worktrees, and capture limits.
-
-### What gets recorded, and where
-
-| Record | Default location | What it establishes |
-| --- | --- | --- |
-| Requirements, design, and tasks | Product repo: `specs/<slug>/` | Intended behavior, decisions, work assignments, and reported progress |
-| Worker prompts, events, attempts, and usage | `~/.claude/implement/<project>-<slug>/` | What was dispatched, observed execution, exits, and usage where available |
-| Review snapshots and verdicts | Review directories in the run folder | The content submitted for review and the reviewer's response |
-| Recovery state | Run folder: `recovery.json` and `recovery.md` | Last observed Git state, workers, completed commits, and next action |
-| Check evidence | Commands/results beside tasks or in recovery records; logs in the run folder | The behavior exercised and the result; the coordinator must record it |
-| Conversation exports | Worktree: `.specstory/history/` | Captured discussion and context surrounding execution |
-
-`IMPLEMENT_ROOT` changes the worker record root; use matching paths for other helpers.
-Recovery files are snapshots, not live monitors. Conversation history does not prove
-that a test passed or that an interrupted worker stopped. Cross-check against current
-Git state, worker locks, and actual results. Keep raw transcripts and run logs local;
-commit the reusable specs with the product code.
 
 ## SpecFlow: specifications and task planning
 

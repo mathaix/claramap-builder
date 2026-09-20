@@ -63,6 +63,9 @@ explicitly pending.
 | Worker attempts, review snapshots, and recovery state | `~/.claude/implement/<project>-<slug>/` by default |
 | Captured conversation history | `.specstory/history/` in the relevant worktree |
 
+For a concrete directory tree, file ownership, and what to commit, see
+[Where files live](architecture.md#where-files-live).
+
 The [illustrative walkthrough](../skills/implement/references/example-run.md) shows
 these records using a synthetic example. Keep your real transcripts and execution
 logs local.

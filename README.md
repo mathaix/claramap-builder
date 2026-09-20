@@ -54,6 +54,10 @@ progress for resuming the work. Larger changes also include requirements, design
 and tasks committed alongside the code. Missing access or unresolved requirements
 are reported as blockers; unfinished work stays visible.
 
+Feature specs live in **your product repository at `specs/<slug>/`**. Worker records
+and review evidence stay in `~/.claude/implement/`; captured conversations live in
+the worktree’s `.specstory/history/`. See [Where files live](docs/architecture.md#where-files-live).
+
 See the [illustrative walkthrough](skills/implement/references/example-run.md) for the
 records and review process. It is a synthetic example, not a measured execution report.
 

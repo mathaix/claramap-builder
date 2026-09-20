@@ -58,7 +58,8 @@ code. These bundled templates apply [SpecFlow planning concepts](../skills/imple
 Execution records such as worker records,
 review snapshots, verdicts, and `recovery.json` stays under
 `~/.claude/implement/<project>-<slug>/`. SpecStory conversation history lives under the
-worktree's `.specstory/history/`.
+worktree's `.specstory/history/`. See [Where files live](architecture.md#where-files-live)
+for the directory layout, who maintains each record, and what belongs in Git.
 
 ## What the tools establish
 
