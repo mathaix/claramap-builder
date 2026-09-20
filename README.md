@@ -4,7 +4,7 @@
 
 **Agent Skills to Orchestrate Code Development.**
 
-**Claramap Builder is an open-source AgentSkill for orchestrating code development.**
+**Claramap Builder is an open-source agent skill that orchestrates software development with Claude Code and Codex.**
 Install it in your coding harness and invoke `/implement` with a goal. It breaks the
 goal into manageable tasks, gives each worker the context it needs, and selects
 models based on task complexity. It validates what comes back, integrates the
@@ -39,6 +39,31 @@ inspect, and improve. Three goals shaped it:
    worker attempts, check results, and review findings. Use those records to understand
    repeated work, slow handoffs, and verification gaps, then make targeted improvements
    and evaluate them on later runs.
+
+### Where it fits
+
+I wanted spec-driven development with a coordinator that owns the complete goal:
+assigning contextual work, validating the integrated result, and preserving evidence
+for the next run. Claramap Builder packages that workflow as an MIT-licensed agent
+skill with inspectable helpers.
+
+| Approach | Documents and structure | Workflow support |
+| --- | --- | --- |
+| [Kiro feature specs](https://kiro.dev/docs/specs/feature-specs/) | Requirements, design, and tasks; EARS acceptance criteria | Spec workflow integrated into Kiro |
+| [GitHub Spec Kit](https://github.com/github/spec-kit) | Specification, technical plan, and tasks | CLI setup, templates, and agent skills/commands for implementation and convergence |
+| [Codex project instructions](https://learn.chatgpt.com/docs/agent-configuration/agents-md) | `AGENTS.md` carries project instructions; teams supply their own spec conventions | Codex loads instructions into agent context; project tools and checks implement additional gates |
+| [Claude Code project instructions](https://code.claude.com/docs/en/memory) | `CLAUDE.md` carries project instructions; teams supply their own spec conventions | Claude loads instructions into agent context; project tools and checks implement additional gates |
+| **Claramap Builder** | Kiro-style specs, EARS, scoped worker briefs, exact-tree review records, and token reports | Agent skill plus worker, review, usage, and recovery helpers; currently coordinates Claude Code and Codex |
+
+These approaches operate at different layers and can be combined. A project's
+`SPEC.md` and use of RFC 2119 words such as MUST or SHOULD are authoring choices;
+this comparison does not treat them as a universal Codex or Claude Code spec format.
+
+Claramap Builder's review helper checks that approval names the reviewed Git tree
+and that the captured content remains unchanged. The coordinator still judges
+reviewer independence, finding dispositions, and check results. Token reports show
+observed usage, not verified billing. See [Architecture](docs/architecture.md) for
+the boundaries of those guarantees.
 
 ## Architecture
 
