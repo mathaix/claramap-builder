@@ -1,8 +1,8 @@
-# Mathaix Build
+# Claramap Builder
 
 **Agent Skills to Orchestrate Code Development.**
 
-Mathaix Build is an open-source agent orchestrator that turns a development goal into
+Claramap Builder is an open-source agent orchestrator that turns a development goal into
 built, checked, and independently reviewed code. It breaks the goal into manageable
 tasks, gives each worker the context it needs, and selects models based on task
 complexity. It validates what comes back, integrates the changes, and iterates until
@@ -21,7 +21,7 @@ bundled helpers support worker execution, review snapshots, and recovery.
 3. **Validate and integrate.** Check returned work against the requirements, combine changes, and obtain independent review.
 4. **Iterate to completion.** Address failed checks and review findings, preserving progress across interruptions.
 
-![Claude coordinates scoped workers, validates their results, and integrates the change](skills/implement/assets/implement-workflow.png)
+![Claude coordinates scoped workers, validates their results, and integrates the change](skills/implement/assets/claramap-builder-hero.png)
 
 Give it a concrete goal in your project:
 
@@ -45,8 +45,8 @@ independent reviewer. Codex CLI is needed when delegating to Codex workers. Help
 support macOS/Linux and Windows through WSL. See [setup and model access](docs/installation.md#requirements).
 
 ```sh
-git clone https://github.com/mathaix/skills.git ~/mathaix-skills
-cd ~/mathaix-skills
+git clone https://github.com/mathaix/claramap-builder.git ~/claramap-builder
+cd ~/claramap-builder
 python3 scripts/install.py implement
 ```
 
@@ -61,7 +61,7 @@ Enter `/implement` followed by your goal. The [first-build guide](docs/usage.md)
 worker capture, what to expect, and how to resume. The installer copies the skill into
 `~/.claude/skills/implement`; it preserves existing installations unless you request replacement.
 
-Mathaix Build is [MIT licensed](LICENSE). Model usage runs through your existing
+Claramap Builder is [MIT licensed](LICENSE). Model usage runs through your existing
 accounts and is subject to their billing. Check the [model policy](docs/installation.md#model-policy)
 before dispatching workers.
 

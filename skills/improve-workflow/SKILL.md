@@ -11,7 +11,7 @@ and conversation history to explain where time went and what should change. You 
 use it to answer questions such as: Are recent runs faster? Why did a small fix take
 an hour? Which checks were repeated? Did fewer review rounds miss important defects?
 
-The companion [implement skill](https://github.com/mathaix/skills/tree/main/skills/implement)
+The companion [implement skill](https://github.com/mathaix/claramap-builder/tree/main/skills/implement)
 coordinates product development. Improve-workflow studies the evidence left by that
 work and helps improve the orchestration instructions, agent assignments, helper tools,
 and verification strategy. It can also analyze other workflows with equivalent records;
@@ -157,7 +157,7 @@ because logs are available.
 
 ## Installation and companion guides
 
-See [installation](https://github.com/mathaix/skills/blob/main/docs/installation.md)
-and the [improve-workflow guide](https://github.com/mathaix/skills/blob/main/docs/improve-workflow.md)
-for setup and examples. The [implement guide](https://github.com/mathaix/skills/blob/main/docs/implement.md)
+See [installation](https://github.com/mathaix/claramap-builder/blob/main/docs/installation.md)
+and the [improve-workflow guide](https://github.com/mathaix/claramap-builder/blob/main/docs/improve-workflow.md)
+for setup and examples. The [implement guide](https://github.com/mathaix/claramap-builder/blob/main/docs/implement.md)
 explains the development orchestrator whose records this skill can analyze.

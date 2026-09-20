@@ -108,5 +108,5 @@ Include that table in the final response. Tokens are not dollars.
 Paths are relative to the installed skill; run helpers with `python3`. SpecStory capture
 is required for coordinator and worker sessions. Validate helper changes with
 `python3 -m unittest discover -s <skill>/tests -v`. Use the separate
-[improve-workflow skill](https://github.com/mathaix/skills/tree/main/skills/improve-workflow)
+[improve-workflow skill](https://github.com/mathaix/claramap-builder/tree/main/skills/improve-workflow)
 only when asked to analyze runs.

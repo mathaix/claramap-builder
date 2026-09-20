@@ -1,6 +1,6 @@
-# Your first build with Mathaix Build
+# Your first build with Claramap Builder
 
-[Mathaix Build](../README.md) · [Installation and configuration](installation.md) · [How orchestration works](implement.md)
+[Claramap Builder](../README.md) · [Installation and configuration](installation.md) · [How orchestration works](implement.md)
 
 Start with a small feature or bug fix in an existing Git repository. Give `/implement`
 a concrete outcome and a way to recognize success.

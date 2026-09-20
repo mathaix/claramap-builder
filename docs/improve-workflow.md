@@ -1,8 +1,8 @@
 # Improve how the next build runs
 
-[Mathaix Build](../README.md) · [Your first build](usage.md) · [Installation](installation.md) · [Implement guide](implement.md)
+[Claramap Builder](../README.md) · [Your first build](usage.md) · [Installation](installation.md) · [Implement guide](implement.md)
 
-`/improve-workflow` is Mathaix Build's feedback loop. It examines completed work to
+`/improve-workflow` is Claramap Builder's feedback loop. It examines completed work to
 explain where time went, which work repeated, and what verification was missing.
 It recommends changes and can update the relevant skills and tools when requested.
 
@@ -43,7 +43,7 @@ Name the maintained source and the changes you want made:
 
 ```text
 /improve-workflow Apply the duplicate-check improvements from this review in
-~/mathaix-skills. Update the instructions and helpers, verify the affected behavior,
+~/claramap-builder. Update the instructions and helpers, verify the affected behavior,
 and report what must be measured in future runs.
 ```
 

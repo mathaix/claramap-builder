@@ -1,13 +1,13 @@
-# How Mathaix Build orchestrates development
+# How Claramap Builder orchestrates development
 
-[Mathaix Build](../README.md) · [Your first build](usage.md) · [Installation and configuration](installation.md)
+[Claramap Builder](../README.md) · [Your first build](usage.md) · [Installation and configuration](installation.md)
 
-`/implement` is Mathaix Build's primary command. It turns a goal into scoped work,
+`/implement` is Claramap Builder's primary command. It turns a goal into scoped work,
 coordinates execution, and validates the integrated result. Claude Code holds the
 full goal and makes orchestration decisions; Codex workers take bounded assignments
 when delegation is useful.
 
-![Claude coordinates workers and integrates a verified result](../skills/implement/assets/implement-workflow.png)
+![Claude coordinates workers and integrates a verified result](../skills/implement/assets/claramap-builder-hero.png)
 
 ## Start a run
 

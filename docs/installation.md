@@ -1,6 +1,6 @@
-# Install and configure Mathaix Build
+# Install and configure Claramap Builder
 
-[Mathaix Build](../README.md) · [Your first build](usage.md) · [Implement guide](implement.md) · [Improve-workflow guide](improve-workflow.md)
+[Claramap Builder](../README.md) · [Your first build](usage.md) · [Implement guide](implement.md) · [Improve-workflow guide](improve-workflow.md)
 
 Install `implement` to orchestrate code development. Add `improve-workflow` when you
 want to analyze completed runs. The skills can be installed independently; their
@@ -69,8 +69,8 @@ SpecStory saves exported conversation history under `.specstory/history/`; `--no
 ## Personal installation
 
 ```sh
-git clone https://github.com/mathaix/skills.git ~/mathaix-skills
-cd ~/mathaix-skills
+git clone https://github.com/mathaix/claramap-builder.git ~/claramap-builder
+cd ~/claramap-builder
 python3 scripts/install.py implement
 python3 scripts/install.py improve-workflow
 ```

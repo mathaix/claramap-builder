@@ -1,6 +1,6 @@
-# Contributing to Mathaix Build
+# Contributing to Claramap Builder
 
-[Mathaix Build](README.md) · [Installation and configuration](docs/installation.md)
+[Claramap Builder](README.md) · [Installation and configuration](docs/installation.md)
 
 Contributions can improve the agent instructions, helpers, examples, or documentation.
 For a bug, include the expected behavior, what happened, and a minimal reproduction.
