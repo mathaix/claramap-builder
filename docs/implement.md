@@ -37,12 +37,11 @@ flowchart TD
     D --> H["Claude integrates and validates"]
     G --> H
     H --> I{"Behavior checks pass?"}
-    I -- "No" --> M["Claude repairs or reassigns"]
+    I -- "No" --> B
     I -- "Yes" --> J["Independent Claude Opus review"]
     J --> K{"Blocking findings?"}
-    K -- "Yes" --> M
+    K -- "Yes" --> B
     K -- "No" --> L["Reviewed change<br/>evidence and open risks"]
-    M --> H
 ```
 
 Claude may use optional planning documents adapted from [SpecFlow concepts](../skills/implement/references/specflow.md) to define larger tasks. [SpecStory](../skills/improve-workflow/references/specstory.md) separately captures conversation history for recovery and later workflow analysis. Native Claude agents can take bounded work when a Codex worker lacks a required local capability.

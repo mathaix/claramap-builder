@@ -33,12 +33,11 @@ flowchart TD
     D --> H["Claude integrates and validates"]
     G --> H
     H --> I{"Behavior checks pass?"}
-    I -- "No" --> M["Claude repairs or reassigns"]
+    I -- "No" --> B
     I -- "Yes" --> J["Independent Claude Opus review"]
     J --> K{"Blocking findings?"}
-    K -- "Yes" --> M
+    K -- "Yes" --> B
     K -- "No" --> L["Reviewed change<br/>evidence and open risks"]
-    M --> H
 ```
 
 1. **Frame the result.** Claude reads the request and code, then records what success
