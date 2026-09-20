@@ -54,7 +54,8 @@ remains required.
 Beyond a small change, the spec lives in your repository at `specs/<slug>/`:
 `requirements.md` in EARS form (WHEN ... THE SYSTEM SHALL ...), `design.md`, and a
 checkbox `tasks.md` that cites requirement IDs. It is committed and reviewed with the
-code, the same layout Kiro feature specs use. Execution residue such as worker records,
+code. These bundled templates apply [SpecFlow planning concepts](../skills/implement/references/spec-format.md).
+Execution records such as worker records,
 review snapshots, verdicts, and `recovery.json` stays under
 `~/.claude/implement/<project>-<slug>/`. SpecStory conversation history lives under the
 worktree's `.specstory/history/`.

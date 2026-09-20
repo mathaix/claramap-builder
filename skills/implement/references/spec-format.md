@@ -1,9 +1,16 @@
 # Spec format
 
-`specs/<slug>/` follows the structure of [Kiro feature specs](https://kiro.dev/docs/specs/feature-specs/)
-(checked 2026-09-20): requirements in EARS notation, a design document, and a task list
-that cites requirement IDs, all committed with the code. The templates are original
-adaptations; nothing is copied from Kiro.
+Claramap Builder uses [SpecFlow](https://www.specflow.com/getting-started.html) to
+structure intent, planning, scoped tasks, contextual execution, and refinement.
+The bundled templates apply those concepts in `specs/<slug>/`: requirements capture
+intent and acceptance criteria, design records the approach and decisions, and tasks
+break the work into assignments with observable checks. Worker briefs carry the
+relevant intent and task context into execution.
+
+These are Claramap Builder's own templates, committed with the code. Their filenames,
+requirement IDs, EARS statements, and review/evidence fields are local conventions;
+SpecFlow does not prescribe this exact file layout. No separate SpecFlow runtime
+package is required.
 
 | File | Holds | Not here |
 | --- | --- | --- |

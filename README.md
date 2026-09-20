@@ -4,17 +4,35 @@
 
 **Agent Skills to Orchestrate Code Development.**
 
-Claramap Builder is an open-source agent orchestrator that turns a development goal into
-built, checked, and independently reviewed code. It breaks the goal into manageable
-tasks, gives each worker the context it needs, and selects models based on task
-complexity. It validates what comes back, integrates the changes, and iterates until
-the requested behavior is implemented and the required checks pass.
+**Claramap Builder is an open-source AgentSkill for orchestrating code development.**
+Install it in your coding harness and invoke `/implement` with a goal. It breaks the
+goal into manageable tasks, gives each worker the context it needs, and selects
+models based on task complexity. It validates what comes back, integrates the
+changes, and iterates until the requested behavior is implemented and the required
+checks pass.
 
-Claude Code coordinates the work through `/implement`, with optional Codex workers.
-Small, settled changes can be handled directly. The skills provide the instructions;
-bundled helpers support worker execution, review snapshots, and recovery.
+The skill bundles instructions, references, spec templates, and executable helpers.
+The current implementation uses **Claude Code, Codex, SpecStory, and SpecFlow**.
+The AgentSkill format can be adapted to other coding harnesses; the shipped setup
+uses Claude Code as its host. See [harness support](docs/dependencies.md#agent-skill-packaging-and-harness-support).
 
-[Get started](docs/usage.md) · [How it works](docs/implement.md) · [Installation](docs/installation.md)
+[Install the skill](docs/usage.md) · [How it works](docs/implement.md) · [Dependencies in detail](docs/dependencies.md)
+
+## Dependencies and how they work together
+
+| Component | What it does in Claramap Builder |
+| --- | --- |
+| **Claude Code — orchestration and review** | Hosts the skill, holds the goal and project context, scopes tasks, selects workers, validates their results, integrates changes, and coordinates repairs. A separate Claude agent performs independent final review. |
+| **Codex — scoped workers** | Executes delegated coding, diagnosis, verification, and QA tasks. Each worker receives a contextual brief and a model selected for task complexity. Claude can handle small changes directly. |
+| **SpecStory — session capture** | Captures coordinator and worker conversations so decisions, handoffs, and interruptions can be inspected. This history supports recovery and `/improve-workflow` analysis alongside execution records. |
+| **SpecFlow — specifications and task planning** | Structures the work around intent, a plan, scoped tasks, contextual execution, and refinement. The bundled spec templates and worker briefs carry that structure into the build. |
+
+Install and authenticate Claude Code and Codex CLI, and install SpecStory CLI for
+session capture. SpecFlow's planning structure is incorporated in the skill's
+[templates and instructions](skills/implement/references/spec-format.md); it does
+not require a separate runtime package. Python 3.11+, Git, and a POSIX environment
+run the helpers. See the [detailed dependency guide](docs/dependencies.md) for setup
+responsibilities, capture records, and adapting the skill to another harness.
 
 ## From goal to built code
 
@@ -94,13 +112,14 @@ requested. Compare later runs to see whether those changes helped. See the
 | --- | --- |
 | [Your first build](docs/usage.md) | Install, give a goal, inspect the result, and resume |
 | [How orchestration works](docs/implement.md) | Task scoping, worker selection, validation, and completion |
+| [Dependencies and architecture](docs/dependencies.md) | Claude, Codex, SpecStory, SpecFlow, capture records, and harness support |
 | [Installation and configuration](docs/installation.md) | Prerequisites, model policy, project setup, updates, and removal |
 | [Improve the next build](docs/improve-workflow.md) | Investigate runs and apply evidence-based improvements |
 | [Illustrative walkthrough](skills/implement/references/example-run.md) | Follow a request through specs, checks, and review |
 | [Contributing](CONTRIBUTING.md) | Repository structure, tests, and contribution guidance |
 
 The installed agent instructions live in [implement](skills/implement/SKILL.md) and
-[improve-workflow](skills/improve-workflow/SKILL.md). Spec templates follow the
-[Kiro feature-spec structure](skills/implement/references/spec-format.md).
+[improve-workflow](skills/improve-workflow/SKILL.md). The bundled templates apply
+[SpecFlow planning concepts](skills/implement/references/spec-format.md).
 
 Built by [mathaix](https://github.com/mathaix).

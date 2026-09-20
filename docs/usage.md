@@ -5,6 +5,9 @@
 Start with a small feature or bug fix in an existing Git repository. Give `/implement`
 a concrete outcome and a way to recognize success.
 
+See [dependencies and architecture](dependencies.md) for how Claude, Codex, and
+SpecStory work together and what the AgentSkill package contains.
+
 ## 1. Install and check access
 
 Follow [installation](installation.md#personal-installation) to install `implement`.

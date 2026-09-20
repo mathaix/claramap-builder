@@ -11,6 +11,13 @@ prerequisites, capture, model configuration, installation options, and maintenan
 
 ## Requirements
 
+The current implementation depends on **Claude Code, Codex CLI, and SpecStory CLI**.
+Claude coordinates and independently reviews, Codex executes delegated tasks, and
+SpecStory captures conversation history. See [dependencies and architecture](dependencies.md)
+for the detailed responsibilities, capture records, and SpecFlow's role in specifications and task planning.
+SpecFlow is incorporated in the bundled instructions and templates; it requires no separate runtime installation.
+
+
 Requirements depend on the capability you use:
 
 | Capability | Requirements |
