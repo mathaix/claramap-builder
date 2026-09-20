@@ -26,12 +26,26 @@ Include the outcome, acceptance conditions, environment constraints, and any aut
 
 ## How a run works
 
-1. **Define success:** Claude reads the request and code, then records what the result must do. Larger tasks may use optional planning documents adapted from [SpecFlow concepts](../skills/implement/references/specflow.md).
-2. **Build with the right crew:** Claude works directly or gives each Codex or native Claude agent a scoped task and the context needed to complete it. The worker model is chosen for that task's complexity and available capabilities.
-3. **Prove the change:** Claude integrates the work, runs relevant checks, and tests the actual user journey when needed. A worker's completion report still needs acceptance evidence.
-4. **Review and deliver:** a separate Claude Opus agent reviews the complete change. Claude addresses blocking findings and reports the outcome and remaining risks.
+```mermaid
+flowchart TD
+    A["Feature, fix, or PR"] --> B["Claude coordinator<br/>goal and acceptance criteria"]
+    B --> C{"Delegate scoped work?"}
+    C -- "No" --> D["Claude works directly"]
+    C -- "Yes" --> E["Task brief<br/>specific context and checks"]
+    E --> F["Codex worker<br/>model matched to task"]
+    F --> G["Worker result and evidence"]
+    D --> H["Claude integrates and validates"]
+    G --> H
+    H --> I{"Behavior checks pass?"}
+    I -- "No" --> M["Claude repairs or reassigns"]
+    I -- "Yes" --> J["Independent Claude Opus review"]
+    J --> K{"Blocking findings?"}
+    K -- "Yes" --> M
+    K -- "No" --> L["Reviewed change<br/>evidence and open risks"]
+    M --> H
+```
 
-[SpecStory](../skills/improve-workflow/references/specstory.md) separately captures conversation history for recovery and later workflow analysis.
+Claude may use optional planning documents adapted from [SpecFlow concepts](../skills/implement/references/specflow.md) to define larger tasks. [SpecStory](../skills/improve-workflow/references/specstory.md) separately captures conversation history for recovery and later workflow analysis. Native Claude agents can take bounded work when a Codex worker lacks a required local capability.
 
 ## What the coordinator decides
 

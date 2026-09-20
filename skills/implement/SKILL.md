@@ -22,6 +22,25 @@ change itself; it integrates and verifies delegated results before accepting the
 
 ## How a run works
 
+```mermaid
+flowchart TD
+    A["Feature, fix, or PR"] --> B["Claude coordinator<br/>goal and acceptance criteria"]
+    B --> C{"Delegate scoped work?"}
+    C -- "No" --> D["Claude works directly"]
+    C -- "Yes" --> E["Task brief<br/>specific context and checks"]
+    E --> F["Codex worker<br/>model matched to task"]
+    F --> G["Worker result and evidence"]
+    D --> H["Claude integrates and validates"]
+    G --> H
+    H --> I{"Behavior checks pass?"}
+    I -- "No" --> M["Claude repairs or reassigns"]
+    I -- "Yes" --> J["Independent Claude Opus review"]
+    J --> K{"Blocking findings?"}
+    K -- "Yes" --> M
+    K -- "No" --> L["Reviewed change<br/>evidence and open risks"]
+    M --> H
+```
+
 1. **Frame the result.** Claude reads the request and code, then records what success
    looks like. Larger tasks may use optional planning documents adapted from
    [SpecFlow concepts](references/specflow.md).
