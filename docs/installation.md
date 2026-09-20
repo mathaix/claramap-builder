@@ -11,30 +11,36 @@ prerequisites, capture, model configuration, installation options, and maintenan
 
 ## Requirements
 
-The current implementation depends on **Claude Code, Codex CLI, and SpecStory CLI**.
-Claude coordinates and independently reviews, Codex executes delegated tasks, and
-SpecStory captures conversation history. See [dependencies and architecture](dependencies.md)
-for the detailed responsibilities, capture records, and SpecFlow's role in specifications and task planning.
-SpecFlow is incorporated in the bundled instructions and templates; it requires no separate runtime installation.
+**Install the external tools before your first build.** The Claramap Builder installer
+only copies skill files; it does not install dependencies, authenticate accounts,
+or start SpecStory capture.
 
+1. Install **Python 3.11+ and Git**. Helpers require macOS/Linux or WSL on Windows.
+2. Install and authenticate **[Claude Code](https://github.com/anthropics/claude-code)**,
+   Anthropic's terminal coding agent, using its [setup guide](https://code.claude.com/docs/en/overview).
+   It hosts the skill and coordinates work. Confirm access to the configured independent reviewer.
+3. For delegated builds, install and authenticate **[Codex CLI](https://github.com/openai/codex)**,
+   OpenAI's terminal coding agent, following its [quickstart](https://github.com/openai/codex#quickstart).
+   It executes scoped worker tasks. A direct Claude task or an audit of saved records does not need a Codex worker.
+4. Install **[SpecStory CLI](https://github.com/specstoryai/getspecstory)**, which exports
+   AI coding conversations as Markdown for recovery and analysis. Follow the
+   [CLI installation guide](https://docs.specstory.com/integrations/terminal-coding-agents).
+   On macOS with Homebrew:
 
-Requirements depend on the capability you use:
+   ```sh
+   brew install specstoryai/tap/specstory
+   ```
 
-| Capability | Requirements |
-| --- | --- |
-| Copy either skill into its installation directory | Python 3.11+ |
-| Run a skill in Claude | Installed, authenticated [Claude Code](https://code.claude.com/docs/en/overview) |
-| Run implement's local helpers | Python 3.11+, Git, and macOS/Linux (WSL on Windows) |
-| Delegate to Codex workers | Installed, authenticated Codex CLI with access to the selected allowed model |
-| Complete implement's independent review | Access to the policy's reviewer through Claude's native agent interface |
-| Capture the documented workflow | [SpecStory CLI](https://docs.specstory.com/integrations/terminal-coding-agents), capturing coordinator and any worker sessions |
+**[SpecFlow](https://github.com/specstoryai/specflow) needs no installation.** It is
+SpecStory's planning methodology for development with agents. The skill incorporates
+its intent, roadmap, tasks, execution, and refinement approach in the bundled
+instructions and templates. Read the [method guide](https://www.specflow.com/getting-started.html)
+for background.
 
-SpecStory is a workflow requirement for preserving conversation context for recovery and
-later audits; the Python helpers do not depend on it to execute. Install it with
-`brew install specstoryai/tap/specstory` on Homebrew. An audit of an older run can still
-use partial evidence when capture is missing, with that limitation reported.
+See [dependencies and architecture](dependencies.md) for each component's role and
+the connections between planning, execution, review, and capture.
 
-Check the setup:
+Check the setup (the `codex` check applies when using delegated workers):
 
 ```sh
 python3 --version

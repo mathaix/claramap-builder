@@ -20,19 +20,20 @@ uses Claude Code as its host. See [harness support](docs/dependencies.md#agent-s
 
 ## Dependencies and how they work together
 
-| Component | What it does in Claramap Builder |
-| --- | --- |
-| **Claude Code — orchestration and review** | Hosts the skill, holds the goal and project context, scopes tasks, selects workers, validates their results, integrates changes, and coordinates repairs. A separate Claude agent performs independent final review. |
-| **Codex — scoped workers** | Executes delegated coding, diagnosis, verification, and QA tasks. Each worker receives a contextual brief and a model selected for task complexity. Claude can handle small changes directly. |
-| **SpecStory — session capture** | Captures coordinator and worker conversations so decisions, handoffs, and interruptions can be inspected. This history supports recovery and `/improve-workflow` analysis alongside execution records. |
-| **SpecFlow — specifications and task planning** | Structures the work around intent, a plan, scoped tasks, contextual execution, and refinement. The bundled spec templates and worker briefs carry that structure into the build. |
+These are separate projects used by the skill. **Set up the tools before your first
+build; `scripts/install.py` only copies Claramap Builder's skill files.**
 
-Install and authenticate Claude Code and Codex CLI, and install SpecStory CLI for
-session capture. SpecFlow's planning structure is incorporated in the skill's
-[templates and instructions](skills/implement/references/spec-format.md); it does
-not require a separate runtime package. Python 3.11+, Git, and a POSIX environment
-run the helpers. See the [detailed dependency guide](docs/dependencies.md) for setup
-responsibilities, capture records, and adapting the skill to another harness.
+| Project | What it is and how we use it | Install beforehand? |
+| --- | --- | --- |
+| [Claude Code](https://github.com/anthropics/claude-code) | Anthropic's terminal coding agent. Hosts the skill, coordinates tasks and repairs, and runs a separate agent for independent review. | **Yes.** Install and authenticate; ensure access to the configured reviewer. [Setup](https://code.claude.com/docs/en/overview). |
+| [Codex CLI](https://github.com/openai/codex) | OpenAI's terminal coding agent. Runs scoped workers with relevant context and a model selected for task complexity. | **Yes for delegated builds.** Install and authenticate before launching workers. Direct Claude tasks do not launch Codex. [Setup](https://github.com/openai/codex#quickstart). |
+| [SpecStory CLI](https://github.com/specstoryai/getspecstory) | A tool that saves AI coding conversations as local Markdown. Captures coordinator and worker history for recovery and workflow analysis. | **Yes.** Install its CLI and enable capture before starting the documented workflow. [Setup](https://docs.specstory.com/integrations/terminal-coding-agents). |
+| [SpecFlow](https://github.com/specstoryai/specflow) | SpecStory's methodology for building with software agents: intent, roadmap, tasks, execution, and refinement. Structures our specs and worker briefs. | **No.** Its planning approach is incorporated in the bundled templates and instructions. [Method guide](https://www.specflow.com/getting-started.html). |
+
+Python 3.11+, Git, and macOS/Linux or WSL are also required for the helpers.
+The [installation guide](docs/installation.md#requirements) gives the setup order and
+checks. The [dependency guide](docs/dependencies.md) explains capture records and
+how the components connect.
 
 ## From goal to built code
 

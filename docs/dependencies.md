@@ -7,6 +7,23 @@ references, templates, and helpers that a coding harness can load. The current
 implementation uses Claude, Codex, and SpecStory, with SpecFlow structuring the
 planning workflow. Each serves a different part of the development loop.
 
+## What to install before starting
+
+The linked repositories below are the upstream projects. Claramap Builder's installer
+copies the skill files only; it does not install these tools, authenticate accounts,
+or start session capture.
+
+| Project | What it is | Required setup |
+| --- | --- | --- |
+| [Claude Code](https://github.com/anthropics/claude-code) | Anthropic's terminal coding agent, used here as coordinator and independent reviewer. | Install and authenticate before running the skill. Confirm access to the reviewer selected by the model policy. |
+| [Codex CLI](https://github.com/openai/codex) | OpenAI's terminal coding agent, used here for delegated workers. | Install and authenticate before delegated builds. Not needed for direct Claude work or reading existing run evidence. |
+| [SpecStory CLI](https://github.com/specstoryai/getspecstory) | A conversation capture tool that exports coding-agent sessions to local Markdown. | Install before starting the documented workflow, then enable capture for the relevant sessions. |
+| [SpecFlow](https://github.com/specstoryai/specflow) | SpecStory's structured methodology for development with software agents. | No installation. The skill incorporates the planning method in its templates and instructions. |
+
+Use the [installation checklist](installation.md#requirements) to prepare the tools
+before installing the skill. SpecFlow here refers to SpecStory's agent-development
+methodology, not the unrelated .NET testing framework.
+
 ## How everything connects
 
 ```mermaid
@@ -64,7 +81,7 @@ capabilities, or proof remain explicit blockers to completion.
 
 ## Claude: coordinate, integrate, and review
 
-Claude Code hosts `/implement` and holds the full development goal. The coordinator
+[Claude Code](https://github.com/anthropics/claude-code) hosts `/implement` and holds the full development goal. The coordinator
 inspects the project, establishes requirements, breaks work into scoped tasks, and
 chooses models and reasoning effort according to complexity, risk, and your policy.
 It gives workers relevant context, allowed changes, and acceptance criteria.
@@ -85,7 +102,7 @@ instructions or helpers when asked. An audit is initiated by the user.
 
 ## Codex: execute scoped work
 
-Codex CLI runs delegated workers. A worker gets a bounded brief with the goal it
+[Codex CLI](https://github.com/openai/codex) runs delegated workers. A worker gets a bounded brief with the goal it
 serves, the relevant revision and files, constraints, allowed writes, and checks.
 The coordinator selects an allowed model for the task's uncertainty and complexity;
 the current choices and defaults are in `model-policy.json`.
@@ -105,7 +122,7 @@ audit of existing records does not need to launch a Codex worker. See
 
 ## SpecStory: capture the conversation
 
-SpecStory preserves the conversation around the work: requests, decisions, handoffs,
+[SpecStory](https://github.com/specstoryai/getspecstory) preserves the conversation around the work: requests, decisions, handoffs,
 interruptions, and changes in direction. This helps a resumed coordinator recover
 context and lets `/improve-workflow` investigate why a run took time or repeated work.
 It complements the wrapper's execution records and actual check output.
@@ -154,7 +171,7 @@ commit the reusable specs with the product code.
 
 ## SpecFlow: specifications and task planning
 
-Claramap Builder uses [SpecFlow](https://www.specflow.com/getting-started.html) to
+Claramap Builder uses [SpecFlow](https://github.com/specstoryai/specflow) to
 structure the work from intent through planning, task decomposition, contextual
 execution, and refinement. The skill incorporates this structure in its instructions,
 spec templates, and worker briefs.
