@@ -1,10 +1,12 @@
 # Skills
 
-Reusable coding-agent skills by [mathaix](https://github.com/mathaix).
+Give Claude a code task. **Implement** coordinates the work through checks and independent
+review; **improve-workflow** uses run evidence to improve how the next task is handled.
+Reusable skills by [mathaix](https://github.com/mathaix).
 
 | Skill | What it does |
 | --- | --- |
-| [implement](skills/implement/SKILL.md) | Gives Claude a coordination workflow for a feature, fix, or PR: scope the work, delegate to Codex and Claude agents when useful, verify the integrated result, and obtain independent review. |
+| [implement](skills/implement/SKILL.md) | Helps Claude deliver a feature, fix, or PR as one checked, independently reviewed code change, with Codex and Claude agents brought in when useful. |
 | [improve-workflow](skills/improve-workflow/SKILL.md) | Reviews execution reports and SpecStory history to find bottlenecks and improve the development workflow. |
 
 ## Install a skill

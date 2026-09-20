@@ -1,8 +1,14 @@
-# Using implement
+# Implement: from request to reviewed code
 
 [All guides](usage.md) · [Installation](installation.md) · [Improve-workflow guide](improve-workflow.md)
 
-Work in your product repository, not in the skills collection. With [Claude Code, Codex, and SpecStory installed](installation.md#requirements), start Claude through SpecStory:
+![Claude coordinates task-specific agents and brings their work together as a verified result](../skills/implement/assets/implement-workflow.png)
+
+Give Claude a feature, fix, or unfinished PR. Implement helps deliver one integrated code change with checks against your acceptance criteria and an independent final review. Claude coordinates Codex and Claude agents when the work benefits from them. For a small change, Claude can work directly.
+
+## Start a run
+
+Work in your product repository. With [Claude Code, Codex, and SpecStory installed](installation.md#requirements), start Claude through SpecStory:
 
 ```sh
 specstory run claude --no-cloud-sync
@@ -18,16 +24,12 @@ Include the outcome, acceptance conditions, environment constraints, and any aut
 
 ## How a run works
 
-![Claude coordinates task-specific agents and brings their work together as a verified result](../skills/implement/assets/implement-workflow.png)
+1. **Define success:** Claude reads the request and code, then records what the result must do. Larger tasks may use optional planning documents adapted from [SpecFlow concepts](../skills/implement/references/specflow.md).
+2. **Build with the right crew:** Claude works directly or assigns focused jobs to Codex or native Claude agents according to complexity and available capabilities.
+3. **Prove the change:** Claude integrates the work, runs relevant checks, and tests the actual user journey when needed. A worker's completion report still needs acceptance evidence.
+4. **Review and deliver:** a separate Claude Opus agent reviews the complete change. Claude addresses blocking findings and reports the outcome and remaining risks.
 
-Claude acts as the coordinator for the requested change. It defines the outcome and acceptance criteria, decides how to divide the work, and chooses whether to act directly or delegate to Codex workers or native Claude agents. Workers may investigate, code, run focused checks, or exercise a user journey. Their completion reports are inputs to the coordinator; Claude integrates the work, verifies the requested behavior, and obtains independent review of the final result.
-
-1. **Frame the goal:** inspect the request and code, then record acceptance criteria. A compact run uses `status.md`. Larger work may use optional intent, roadmap, task, and brief documents adapted from [SpecFlow concepts](../skills/implement/references/specflow.md).
-2. **Assign focused work:** choose tasks, dependencies, agent capabilities, allowed actions, and one executor for each check. Agent and model choices depend on complexity, uncertainty, and available access.
-3. **Integrate and verify:** combine changes, run applicable checks on the integrated revision, and exercise the real user journey when needed. Reuse valid check evidence instead of running the same check for every role.
-4. **Review and report:** a separate Claude Opus agent reviews the complete change. Claude addresses blocking findings and reports what passed, what remains pending, and the final result.
-
-SpecFlow informs the optional planning documents. [SpecStory](../skills/improve-workflow/references/specstory.md) separately captures conversation history for recovery and later workflow analysis.
+[SpecStory](../skills/improve-workflow/references/specstory.md) separately captures conversation history for recovery and later workflow analysis.
 
 ## What the coordinator decides
 
