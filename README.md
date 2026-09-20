@@ -18,7 +18,12 @@ uses Claude Code as its host. See [harness support](docs/architecture.md#agent-s
 
 [Install the skill](docs/usage.md) · [How it works](docs/implement.md) · [Architecture](docs/architecture.md)
 
-## Dependencies and how they work together
+## Architecture
+
+[![Claramap Builder architecture: SpecFlow structures the skill; Claude coordinates Codex workers, validates their results, and obtains independent review. SpecStory and run records support workflow analysis.](docs/assets/architecture.png)](docs/architecture.md)
+
+See the [Architecture guide](docs/architecture.md) for the full workflow, component
+responsibilities, installation requirements, and where specs and run records live.
 
 These are separate projects used by the skill. **Set up the tools before your first
 build; `scripts/install.py` only copies Claramap Builder's skill files.**
