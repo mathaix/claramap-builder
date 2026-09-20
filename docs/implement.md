@@ -16,6 +16,19 @@ Then invoke:
 
 Include the outcome, acceptance conditions, environment constraints, and any authorized external steps. A request to fix code does not automatically authorize deployment or messages to other people.
 
+## How a run works
+
+![Claude coordinates task-specific agents and brings their work together as a verified result](../skills/implement/assets/implement-workflow.png)
+
+Claude acts as the coordinator for the requested change. It defines the outcome and acceptance criteria, decides how to divide the work, and chooses whether to act directly or delegate to Codex workers or native Claude agents. Workers may investigate, code, run focused checks, or exercise a user journey. Their completion reports are inputs to the coordinator; Claude integrates the work, verifies the requested behavior, and obtains independent review of the final result.
+
+1. **Frame the goal:** inspect the request and code, then record acceptance criteria. A compact run uses `status.md`. Larger work may use optional intent, roadmap, task, and brief documents adapted from [SpecFlow concepts](../skills/implement/references/specflow.md).
+2. **Assign focused work:** choose tasks, dependencies, agent capabilities, allowed actions, and one executor for each check. Agent and model choices depend on complexity, uncertainty, and available access.
+3. **Integrate and verify:** combine changes, run applicable checks on the integrated revision, and exercise the real user journey when needed. Reuse valid check evidence instead of running the same check for every role.
+4. **Review and report:** a separate Claude Opus agent reviews the complete change. Claude addresses blocking findings and reports what passed, what remains pending, and the final result.
+
+SpecFlow informs the optional planning documents. [SpecStory](../skills/improve-workflow/references/specstory.md) separately captures conversation history for recovery and later workflow analysis.
+
 ## What the coordinator decides
 
 The coordinator chooses whether to implement directly or use agents, how to group work, which checks to run, and when intermediate review would help. Separate planning review is reserved for unresolved consequential design questions or explicit requirements. Routine changes to test commands, filenames, or task order do not restart planning.

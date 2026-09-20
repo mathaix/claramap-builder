@@ -5,30 +5,49 @@ description: "Orchestrate code development in Claude Code: coordinate coding, di
 
 # Implement — code-development orchestrator
 
-Implement is a skill for using **Claude Code to manage code development from a request
-to a working, verified, and reviewed change**. You describe a feature, bug, or unfinished
-PR. Claude takes responsibility for understanding the existing code, organizing the
-work, getting it implemented, checking the result, and reporting what is ready.
+![A goal flows through a Claude coordinator and task-specific workers into one verified result](assets/implement-workflow.png)
 
-The main Claude session acts as the **orchestrator**. It decides which work to do itself
-and which work to assign to subagents. Coding agents make changes; diagnosis agents
-investigate problems; verification and QA agents check technical behavior and user
-journeys; an independent reviewer examines the integrated result. Claude brings those
-results together, handles findings, and chooses the next useful action. You set the
-outcome and constraints, while the orchestrator manages routine execution decisions.
+Implement equips **Claude Code to coordinate a feature, fix, or PR from request to
+reviewed result**. The main Claude session owns the outcome: it understands the code,
+defines what success looks like, breaks down the work, selects checks, integrates results,
+and reports what is ready. It can work directly or assemble a task-specific crew of
+subagents. In the supplied setup, Codex workers can code, diagnose, verify, or run QA
+when they have the needed access; native Claude agents provide supported local fallbacks
+and independent final review. The coordinator chooses roles and models according to the
+task's complexity, uncertainty, and available capabilities.
 
-This workflow is useful when development spans several files, services, or sessions and
-there is coordination work around the coding itself: choosing tests, managing parallel
-changes, following up on review findings, and remembering what has already been checked.
-Its aim is to reduce repeated work and unnecessary handoffs while retaining evidence
-that the requested behavior works. Small changes can stay small; extra agents and
-intermediate reviews are used when they help.
+This is useful when a change spans files, services, or sessions and the coordination
+matters as much as the code: assigning bounded work, avoiding repeated checks, and
+keeping findings and evidence attached to the result. A worker's "done" is a report,
+not acceptance of the feature. Claude checks the integrated behavior against the
+owner's criteria and obtains independent review. Small tasks can stay with the
+coordinator; extra agents and intermediate reviews are used when they help.
 
-The skill includes instructions **and executable tools**. In the supplied setup, Claude
-launches Codex workers through the bundled wrapper and uses native Claude agents for
-independent review and supported local fallbacks. Other scripts record test results,
-prepare source copies for review, and preserve run state so interrupted work can resume.
-The tables below link to each role, script, and supporting guide.
+## Workflow at a glance
+
+1. **Define the outcome.** Inspect the request, existing code, Git state, and repository
+   rules. Record acceptance criteria in a compact run status. When scope benefits from
+   more structure, use optional intent, roadmap, task, and brief documents adapted from
+   [SpecFlow concepts](references/specflow.md). These are planning aids, not required
+   stages or a SpecFlow runtime dependency.
+2. **Break down and assign work.** Choose bounded tasks, dependencies, owners, and
+   checks. Give each delegated agent a brief with its outcome, source revision, allowed
+   actions, existing evidence, and stopping condition. Claude may do a task itself or
+   dispatch a Codex or native Claude agent with the required capability.
+3. **Execute and coordinate.** Let independent tasks run in isolated worktrees or fixed
+   source copies. Serialize shared writers and environments. Preserve attempts and
+   decisions so interrupted work can resume without discarding valid progress.
+4. **Verify the integrated change.** Assign each check one executor, reuse passing
+   evidence only while its inputs and environment remain relevant, and exercise actual
+   user journeys when acceptance requires them. The coordinator judges whether the
+   collected evidence establishes the requested behavior.
+5. **Review and finish.** An independent Claude Opus agent reviews the complete
+   integrated change and its evidence. Resolve blocking findings, verify approval of
+   the exact final tree, then report acceptance results and remaining risks.
+
+The skill includes **executable tools** to launch and resume Codex workers, record
+checks, prepare source copies for review, and preserve run state. The tables below link
+to each role, script, and supporting guide.
 
 Implementation reports are kept under `~/.claude/implement/`. Use the separate
 [improve-workflow skill](https://github.com/mathaix/skills/tree/main/skills/improve-workflow)

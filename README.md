@@ -4,7 +4,7 @@ Reusable coding-agent skills by [mathaix](https://github.com/mathaix).
 
 | Skill | What it does |
 | --- | --- |
-| [implement](skills/implement/SKILL.md) | Takes a feature, fix, or PR through implementation, verification, QA, and independent review. The coordinator chooses the work breakdown and checks. |
+| [implement](skills/implement/SKILL.md) | Gives Claude a coordination workflow for a feature, fix, or PR: scope the work, delegate to Codex and Claude agents when useful, verify the integrated result, and obtain independent review. |
 | [improve-workflow](skills/improve-workflow/SKILL.md) | Reviews execution reports and SpecStory history to find bottlenecks and improve the development workflow. |
 
 ## Install a skill
