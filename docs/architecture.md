@@ -1,4 +1,4 @@
-# Dependencies and architecture
+# Architecture
 
 [Claramap Builder](../README.md) · [Your first build](usage.md) · [Installation](installation.md)
 
@@ -26,58 +26,20 @@ methodology, not the unrelated .NET testing framework.
 
 ## How everything connects
 
-```mermaid
-flowchart TD
-    GOAL["Your development goal"]
-    SKILL["Claramap Builder AgentSkill<br/>Instructions, templates, and helpers"]
-    FLOW["SpecFlow<br/>Intent, planning, tasks, and refinement"]
+[![Claramap Builder architecture: SpecFlow structures the AgentSkill; Claude delegates to Codex workers, validates their results, and obtains independent review. Failed checks return for repair. SpecStory history and run records feed requested workflow analysis.](assets/architecture.png)](assets/architecture.png)
 
-    subgraph BUILD["Build and review"]
-        CLAUDE["Claude Code coordinator<br/>Scope tasks and select models"]
-        CODEX["Codex workers<br/>Scoped briefs and isolated work"]
-        VALIDATE["Claude validates and integrates<br/>Code changes and check evidence"]
-        REVIEW["Independent Claude reviewer<br/>Review the integrated code"]
-        DONE["Built and reviewed code<br/>Required checks pass"]
-        CLAUDE -->|"Delegate through the worker wrapper"| CODEX
-        CODEX -->|"Return changes and evidence"| VALIDATE
-        CLAUDE -->|"Implement small tasks directly"| VALIDATE
-        VALIDATE -->|"Failed checks: repair and retry"| CLAUDE
-        VALIDATE -->|"Export a review snapshot"| REVIEW
-        REVIEW -->|"Blocking findings: repair and retry"| CLAUDE
-        REVIEW -->|"Approved content and passing checks"| DONE
-    end
+Select the image to view it at full size.
 
-    GOAL --> CLAUDE
-    FLOW -->|"Planning structure"| SKILL
-    SKILL -->|"Loaded by the coding harness"| CLAUDE
+The numbered row shows a delegated build: Claude scopes the goal, Codex workers
+execute contextual tasks, Claude validates and integrates, and an independent Claude
+agent reviews the result. Failed checks or blocking findings return for repair.
+Small tasks can go directly from Claude implementation to validation without Codex.
 
-    STORY["SpecStory<br/>Captured conversation history"]
-    RECORDS["Run records<br/>Attempts, checks, reviews, recovery"]
-    AUDIT["Claude with /improve-workflow<br/>Analyze bottlenecks and verification gaps"]
-
-    CLAUDE -.->|"Session capture"| STORY
-    CODEX -.->|"Session capture"| STORY
-    CODEX -.->|"Wrapper records"| RECORDS
-    VALIDATE -.->|"Check results and recovery state"| RECORDS
-    REVIEW -.->|"Saved verdict"| RECORDS
-    STORY -.-> AUDIT
-    RECORDS -.-> AUDIT
-    AUDIT -.->|"Apply requested improvements"| SKILL
-
-    classDef input fill:#fff3df,stroke:#c97712,color:#252525
-    classDef execution fill:#edf7f1,stroke:#23724b,color:#173a29
-    classDef evidence fill:#f1f4f8,stroke:#66758a,color:#263445
-    class GOAL,SKILL,FLOW input
-    class CLAUDE,CODEX,VALIDATE,REVIEW,DONE execution
-    class STORY,RECORDS,AUDIT evidence
-```
-
-Solid arrows show the build workflow; dotted arrows show evidence capture and the
-user-requested improvement loop. Claude coordinates the cycle, while the skill
-supplies its instructions and helpers. SpecFlow structures the plan; SpecStory
-records the conversation around execution. Capture must be configured for the
-relevant sessions, and an audit starts only when requested. Missing permissions,
-capabilities, or proof remain explicit blockers to completion.
+SpecFlow structures the skill's planning instructions. SpecStory captures conversations,
+while the helpers and coordinator retain execution records. Both feed
+`/improve-workflow` when requested. Capture must be configured for the relevant
+sessions; improvements are applied only when requested. Completion requires passing
+checks and approved content. Missing permissions, capabilities, or proof stay explicit.
 
 ## Claude: coordinate, integrate, and review
 

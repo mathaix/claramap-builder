@@ -14,9 +14,9 @@ checks pass.
 The skill bundles instructions, references, spec templates, and executable helpers.
 The current implementation uses **Claude Code, Codex, SpecStory, and SpecFlow**.
 The AgentSkill format can be adapted to other coding harnesses; the shipped setup
-uses Claude Code as its host. See [harness support](docs/dependencies.md#agent-skill-packaging-and-harness-support).
+uses Claude Code as its host. See [harness support](docs/architecture.md#agent-skill-packaging-and-harness-support).
 
-[Install the skill](docs/usage.md) · [How it works](docs/implement.md) · [Dependencies in detail](docs/dependencies.md)
+[Install the skill](docs/usage.md) · [How it works](docs/implement.md) · [Architecture](docs/architecture.md)
 
 ## Dependencies and how they work together
 
@@ -32,7 +32,7 @@ build; `scripts/install.py` only copies Claramap Builder's skill files.**
 
 Python 3.11+, Git, and macOS/Linux or WSL are also required for the helpers.
 The [installation guide](docs/installation.md#requirements) gives the setup order and
-checks. The [dependency guide](docs/dependencies.md) explains capture records and
+checks. The [architecture guide](docs/architecture.md) explains capture records and
 how the components connect.
 
 ## From goal to built code
@@ -113,7 +113,7 @@ requested. Compare later runs to see whether those changes helped. See the
 | --- | --- |
 | [Your first build](docs/usage.md) | Install, give a goal, inspect the result, and resume |
 | [How orchestration works](docs/implement.md) | Task scoping, worker selection, validation, and completion |
-| [Dependencies and architecture](docs/dependencies.md) | Claude, Codex, SpecStory, SpecFlow, capture records, and harness support |
+| [Architecture](docs/architecture.md) | Claude, Codex, SpecStory, SpecFlow, capture records, and harness support |
 | [Installation and configuration](docs/installation.md) | Prerequisites, model policy, project setup, updates, and removal |
 | [Improve the next build](docs/improve-workflow.md) | Investigate runs and apply evidence-based improvements |
 | [Illustrative walkthrough](skills/implement/references/example-run.md) | Follow a request through specs, checks, and review |

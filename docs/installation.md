@@ -37,7 +37,7 @@ its intent, roadmap, tasks, execution, and refinement approach in the bundled
 instructions and templates. Read the [method guide](https://www.specflow.com/getting-started.html)
 for background.
 
-See [dependencies and architecture](dependencies.md) for each component's role and
+See [architecture](architecture.md) for each component's role and
 the connections between planning, execution, review, and capture.
 
 Check the setup (the `codex` check applies when using delegated workers):
