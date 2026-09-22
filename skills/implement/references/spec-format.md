@@ -1,7 +1,9 @@
 # Spec format
 
-Claramap Builder follows SpecFlow's planning and refinement methodology, with custom
-requirements, design, and task templates using a Kiro-style feature-spec structure.
+Claramap Builder's feature-spec templates are based on Kiro's three-file structure:
+requirements, design, and tasks, with requirements written in EARS. SpecFlow informs
+the surrounding planning and refinement workflow and the context in worker briefs;
+it is not the source of the feature-spec layout.
 The templates live in `assets/templates/` and produce `specs/<slug>/` in the product
 repository.
 

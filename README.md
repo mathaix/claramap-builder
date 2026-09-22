@@ -13,8 +13,8 @@ checks pass.
 
 The skill bundles instructions, references, spec templates, and executable helpers.
 The current implementation runs on **Claude Code, Codex, and SpecStory**, with
-**SpecFlow** guiding the workflow and **Kiro-style specs using EARS** structuring the
-feature documents. See [attribution](#attribution).
+**Kiro-based feature-spec templates using EARS**. **SpecFlow** informs the broader
+planning and refinement workflow. See [attribution](#attribution).
 The AgentSkill format can be adapted to other coding harnesses; the shipped setup
 uses Claude Code as its host. See [harness support](docs/architecture.md#agent-skill-packaging-and-harness-support).
 
@@ -67,7 +67,7 @@ the boundaries of those guarantees.
 
 ## Architecture
 
-[![Claramap Builder architecture: SpecFlow structures the skill; Claude coordinates Codex workers, validates their results, and obtains independent review. SpecStory and run records support workflow analysis.](docs/assets/architecture.png)](docs/architecture.md)
+[![Claramap Builder architecture: Kiro and EARS inform feature specs; SpecFlow informs the workflow; Claude coordinates Codex workers, validates their results, and obtains independent review. SpecStory and run records support workflow analysis.](docs/assets/architecture.png)](docs/architecture.md)
 
 See the [Architecture guide](docs/architecture.md) for the full workflow, component
 responsibilities, installation requirements, and where specs and run records live.
@@ -80,7 +80,7 @@ build; `scripts/install.py` only copies Claramap Builder's skill files.**
 | [Claude Code](https://github.com/anthropics/claude-code) | Anthropic's terminal coding agent. Hosts the skill, coordinates tasks and repairs, and runs a separate agent for independent review. | **Yes.** Install and authenticate; ensure access to the configured reviewer. [Setup](https://code.claude.com/docs/en/overview). |
 | [Codex CLI](https://github.com/openai/codex) | OpenAI's terminal coding agent. Runs scoped workers with relevant context and a model selected for task complexity. | **Yes for delegated builds.** Install and authenticate before launching workers. Direct Claude tasks do not launch Codex. [Setup](https://github.com/openai/codex#quickstart). |
 | [SpecStory CLI](https://github.com/specstoryai/getspecstory) | A tool that saves AI coding conversations as local Markdown. Captures coordinator and worker history for recovery and workflow analysis. | **Yes.** Install its CLI and enable capture before starting the documented workflow. [Setup](https://docs.specstory.com/integrations/terminal-coding-agents). |
-| [SpecFlow](https://github.com/specstoryai/specflow) | SpecStory's methodology for building with software agents: intent, roadmap, tasks, execution, and refinement. Structures our specs and worker briefs. | **No.** Its planning approach is incorporated in the bundled templates and instructions. [Method guide](https://www.specflow.com/getting-started.html). |
+| [SpecFlow](https://github.com/specstoryai/specflow) | SpecStory's methodology for building with software agents: intent, roadmap, tasks, execution, and refinement. Informs the workflow, task ownership, and context supplied to workers. | **No.** A workflow influence; the feature-spec templates are based on Kiro and EARS. [Method guide](https://www.specflow.com/getting-started.html). |
 
 Python 3.11+, Git, and macOS/Linux or WSL are also required for the helpers.
 The [installation guide](docs/installation.md#requirements) gives the setup order and
@@ -93,7 +93,7 @@ how the components connect.
 
 Install and authenticate Claude Code, Codex CLI (for delegated builds), and SpecStory
 as listed above. Ensure Git and Python 3.11+ (`python3` on PATH) are available.
-SpecFlow is a methodology already included in the skill; there is nothing to install.
+Kiro/EARS inform the spec templates; SpecFlow informs the workflow. Neither needs installation.
 
 With [uv installed](https://docs.astral.sh/uv/getting-started/installation/),
 install both Claramap Builder skills in one command:

@@ -43,9 +43,10 @@ or start SpecStory capture.
    ```
 
 **[SpecFlow](https://github.com/specstoryai/specflow) needs no installation.** It is
-SpecStory's planning methodology for development with agents. The skill incorporates
-its intent, roadmap, tasks, execution, and refinement approach in the bundled
-instructions and templates. Read the [method guide](https://www.specflow.com/getting-started.html)
+SpecStory's planning methodology for development with agents. It informs
+the intent-to-refinement workflow, task ownership, and worker context. The feature-spec
+templates use Kiro's three-file structure and EARS requirements; they are not SpecFlow
+templates. Kiro and EARS also need no installation. Read the [method guide](https://www.specflow.com/getting-started.html)
 for background.
 
 See [architecture](architecture.md) for each component's role and

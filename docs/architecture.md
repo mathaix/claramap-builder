@@ -4,8 +4,8 @@
 
 Claramap Builder packages its orchestration workflow as an AgentSkill: instructions,
 references, templates, and helpers that a coding harness can load. The current
-implementation uses Claude, Codex, and SpecStory, with SpecFlow structuring the
-planning workflow. Each serves a different part of the development loop.
+implementation uses Claude, Codex, and SpecStory. Feature-spec templates are based on
+Kiro and EARS; SpecFlow informs the surrounding planning and refinement workflow. Each serves a different part of the development loop.
 
 ## What to install before starting
 
@@ -18,7 +18,7 @@ or start session capture.
 | [Claude Code](https://github.com/anthropics/claude-code) | Anthropic's terminal coding agent, used here as coordinator and independent reviewer. | Install and authenticate before running the skill. Confirm access to the reviewer selected by the model policy. |
 | [Codex CLI](https://github.com/openai/codex) | OpenAI's terminal coding agent, used here for delegated workers. | Install and authenticate before delegated builds. Not needed for direct Claude work or reading existing run evidence. |
 | [SpecStory CLI](https://github.com/specstoryai/getspecstory) | A conversation capture tool that exports coding-agent sessions to local Markdown. | Install before starting the documented workflow, then enable capture for the relevant sessions. |
-| [SpecFlow](https://github.com/specstoryai/specflow) | SpecStory's structured methodology for development with software agents. | No installation. The skill incorporates the planning method in its templates and instructions. |
+| [SpecFlow](https://github.com/specstoryai/specflow) | SpecStory's structured methodology for development with software agents. | No installation. A workflow influence, not the source of the Kiro/EARS feature-spec templates. |
 
 Use the [installation checklist](installation.md#requirements) to prepare the tools
 before installing the skill. SpecFlow here refers to SpecStory's agent-development
@@ -26,7 +26,7 @@ methodology, not the unrelated .NET testing framework.
 
 ## How everything connects
 
-[![Claramap Builder architecture: SpecFlow structures the AgentSkill; Claude delegates to Codex workers, validates their results, and obtains independent review. Failed checks return for repair. SpecStory history and run records feed requested workflow analysis.](assets/architecture.png)](assets/architecture.png)
+[![Claramap Builder architecture: Kiro and EARS inform feature specs; SpecFlow informs the workflow; Claude delegates to Codex workers, validates their results, and obtains independent review. Failed checks return for repair. SpecStory history and run records feed requested workflow analysis.](assets/architecture.png)](assets/architecture.png)
 
 Select the image to view it at full size.
 
@@ -35,7 +35,9 @@ execute contextual tasks, Claude validates and integrates, and an independent Cl
 agent reviews the result. Failed checks or blocking findings return for repair.
 Small tasks can go directly from Claude implementation to validation without Codex.
 
-SpecFlow structures the skill's planning instructions. SpecStory captures conversations,
+The image's SpecFlow card represents a workflow influence. Kiro and EARS supply
+the feature-spec structure; SpecFlow informs planning, task ownership, worker
+context, and refinement. SpecStory captures conversations,
 while the helpers and coordinator retain execution records. Both feed
 `/improve-workflow` when requested. Capture must be configured for the relevant
 sessions; improvements are applied only when requested. Completion requires passing
@@ -195,12 +197,19 @@ execution still uses the configured providers. See the
 and the [detailed capture guide](../skills/improve-workflow/references/specstory.md)
 for existing-session exports, worktrees, and capture limits.
 
-## SpecFlow: specifications and task planning
+## Specification templates: Kiro and EARS
+
+The feature-spec templates use **Kiro's `requirements.md`, `design.md`, and `tasks.md`
+layout**, with **EARS requirements** and tasks that cite requirement IDs. These are
+Claramap Builder adaptations, not an official template pack. Specs live alongside
+the product code in `specs/<slug>/`.
+
+### SpecFlow: workflow influence
 
 Claramap Builder uses [SpecFlow](https://github.com/specstoryai/specflow) to
 structure the work from intent through planning, task decomposition, contextual
-execution, and refinement. The skill incorporates this structure in its instructions,
-spec templates, and worker briefs.
+execution, and refinement. This influences the workflow instructions and worker context, rather than
+defining the feature-spec file layout.
 
 | Planning concept | How the skill applies it |
 | --- | --- |
