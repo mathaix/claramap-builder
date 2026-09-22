@@ -91,16 +91,24 @@ how the components connect.
 
 ### One-time setup
 
-Install and authenticate the tools listed above, then install the skill:
+Install and authenticate Claude Code, Codex CLI (for delegated builds), and SpecStory
+as listed above. Ensure Git and Python 3.11+ (`python3` on PATH) are available.
+SpecFlow is a methodology already included in the skill; there is nothing to install.
+
+With [uv installed](https://docs.astral.sh/uv/getting-started/installation/),
+install both Claramap Builder skills in one command:
 
 ```sh
 git clone https://github.com/mathaix/claramap-builder.git ~/claramap-builder
 cd ~/claramap-builder
-python3 scripts/install.py implement
+uv run scripts/install.py
 ```
 
-This copies the primary skill into `~/.claude/skills/implement`, making `/implement`
-available across your projects. You do not repeat this installation for each build.
+This installs `/implement` and `/improve-workflow` under `~/.claude/skills/`,
+available across your projects. You do not repeat installation for each build.
+Without uv, use `python3 scripts/install.py`. uv can provide Python for the installer;
+the runtime helpers still require `python3` 3.11+ on PATH. Neither command installs
+or authenticates the external tools.
 See [installation and updates](docs/installation.md) for model access, project-specific
 installation, and upgrading the skill.
 
@@ -158,13 +166,7 @@ The companion `/improve-workflow` skill examines completed runs to find repeated
 slow handoffs, and verification gaps. Ask why a small fix took an hour, where checks
 were duplicated, or what should change before the next build.
 
-Install it from this repository:
-
-```sh
-python3 scripts/install.py improve-workflow
-```
-
-Then ask in your project:
+It is included in the default installation. Ask in your project:
 
 ```text
 /improve-workflow Review the last three runs. Find repeated work and bottlenecks,

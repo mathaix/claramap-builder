@@ -14,7 +14,7 @@ skills/
   implement/        # Orchestration instructions, templates, helpers, and tests
   improve-workflow/ # Workflow analysis instructions and review template
 docs/              # Human-facing setup and usage guides
-scripts/install.py # Install one selected skill
+scripts/install.py # Install both skills by default, or one selected skill
 tests/             # Installer tests
 ```
 

@@ -238,7 +238,8 @@ SpecFlow executable, imported package, or service to install for these helpers.
 
 [Agent Skills](https://agentskills.io/home) packages instructions and supporting
 resources in a format that compatible agents can load. Claramap Builder's primary
-skill is `skills/implement/`; `skills/improve-workflow/` is its optional companion.
+skill is `skills/implement/`; `skills/improve-workflow/` is its companion for analyzing completed runs.
+The default installer installs both; using the companion is optional.
 Each includes a `SKILL.md` entrypoint and the resources needed for its role.
 
 The format makes the workflow portable. The shipped execution integration is specific

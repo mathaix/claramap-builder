@@ -15,7 +15,7 @@ class InstallTests(unittest.TestCase):
         self.skills = Path(self.tmp.name) / 'skills'
 
     def call(self, name='implement', *extra):
-        return subprocess.run([sys.executable, str(ROOT / 'scripts/install.py'), name,
+        return subprocess.run([sys.executable, str(ROOT / 'scripts/install.py'), *([name] if name else []),
                                '--skills-dir', str(self.skills), *extra], text=True, capture_output=True)
 
     def test_install_includes_references_and_executable_wrapper(self):
@@ -78,3 +78,45 @@ class InstallTests(unittest.TestCase):
                                  '--skills-dir', str(ROOT / 'skills'), '--replace'], capture_output=True)
         self.assertNotEqual(result.returncode, 0)
         self.assertTrue((ROOT / 'skills/implement/SKILL.md').is_file())
+
+    def test_default_installs_both_and_replacement_backs_up_both(self):
+        result = self.call(None)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        for name in ('implement', 'improve-workflow'):
+            (self.skills / name / 'SKILL.md').write_text('local ' + name)
+        result = self.call(None, '--replace')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        records = json.loads(result.stdout)
+        self.assertEqual({r['skill'] for r in records}, {'implement', 'improve-workflow'})
+        for record in records:
+            self.assertEqual((Path(record['backup']) / 'SKILL.md').read_text(),
+                             'local ' + record['skill'])
+            self.assertTrue((Path(record['installed']) / 'SKILL.md').is_file())
+
+    def test_second_destination_conflict_leaves_first_uninstalled(self):
+        self.assertEqual(self.call('improve-workflow').returncode, 0)
+        result = self.call(None)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse((self.skills / 'implement').exists())
+
+    def test_failed_second_publish_restores_both_originals(self):
+        import importlib.util
+        from unittest.mock import patch
+        spec = importlib.util.spec_from_file_location('installer', ROOT / 'scripts/install.py')
+        installer = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(installer)
+        self.assertEqual(self.call(None).returncode, 0)
+        for name in installer.BUNDLED_SKILLS:
+            (self.skills / name / 'SKILL.md').write_text('local ' + name)
+        original_rename = Path.rename
+
+        def fail_second(path, target):
+            if path.name == 'improve-workflow' and path.parent.name.startswith('.claramap-install-'):
+                raise OSError('simulated publish failure')
+            return original_rename(path, target)
+
+        with patch.object(Path, 'rename', fail_second):
+            with self.assertRaisesRegex(OSError, 'simulated'):
+                installer.install_many(installer.BUNDLED_SKILLS, self.skills, replace=True)
+        for name in installer.BUNDLED_SKILLS:
+            self.assertEqual((self.skills / name / 'SKILL.md').read_text(), 'local ' + name)

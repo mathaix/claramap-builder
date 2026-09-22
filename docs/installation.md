@@ -2,20 +2,31 @@
 
 [Claramap Builder](../README.md) · [Your first build](usage.md) · [Implement guide](implement.md) · [Improve-workflow guide](improve-workflow.md)
 
-Install `implement` to orchestrate code development. Add `improve-workflow` when you
-want to analyze completed runs. The skills can be installed independently; their
-commands remain `/implement` and `/improve-workflow`.
+One installation includes both skills: `/implement` orchestrates code development,
+and `/improve-workflow` analyzes completed runs. You can still select an individual
+skill when needed.
 
 For the first-run sequence, use [Your first build](usage.md). This page covers
 prerequisites, capture, model configuration, installation options, and maintenance.
 
 ## Requirements
 
+**To install the skill files:** you need Git and either
+[uv](https://docs.astral.sh/uv/getting-started/installation/) or Python 3.11+.
+The recommended `uv run scripts/install.py` command selects a compatible Python
+interpreter (downloading one if needed); the installer has no Python package dependencies.
+
+**To use the skills:** complete the following setup before your first build.
+Using uv for installation does not put a compatible `python3` on your shell's PATH
+or install the coding agents and capture tools for you.
+
 **Install the external tools before your first build.** The Claramap Builder installer
 only copies skill files; it does not install dependencies, authenticate accounts,
 or start SpecStory capture.
 
-1. Install **Python 3.11+ and Git**. Helpers require macOS/Linux or WSL on Windows.
+1. Install **Python 3.11+ and Git** on macOS/Linux or WSL on Windows.
+   Ensure `python3 --version` reports 3.11 or newer in the shell where workers run;
+   the worker wrapper invokes `python3` directly.
 2. Install and authenticate **[Claude Code](https://github.com/anthropics/claude-code)**,
    Anthropic's terminal coding agent, using its [setup guide](https://code.claude.com/docs/en/overview).
    It hosts the skill and coordinates work. Confirm access to the configured independent reviewer.
@@ -51,11 +62,10 @@ specstory version
 specstory check
 ```
 
-The skills can be installed separately. Implement can handle small changes directly in
+Both skills are installed by default. Implement can handle small changes directly in
 Claude; it needs Codex only when delegating to Codex workers. Improve-workflow can analyze
 existing records without launching workers and adds no fixed model requirement of its own.
 
-The skill installer only copies skill files. It does not install these programs, authenticate them, or start SpecStory.
 
 ## Run Claude and Codex through SpecStory
 
@@ -84,11 +94,19 @@ SpecStory saves exported conversation history under `.specstory/history/`; `--no
 ```sh
 git clone https://github.com/mathaix/claramap-builder.git ~/claramap-builder
 cd ~/claramap-builder
-python3 scripts/install.py implement
-python3 scripts/install.py improve-workflow
+uv run scripts/install.py
 ```
 
-Each command installs only the named skill and its supporting files under `~/.claude/skills/<name>/`. Invoke them with `/implement` and `/improve-workflow`. Install either or both. See the [official skill documentation](https://code.claude.com/docs/en/skills).
+This installs **both** skills and their supporting files under
+`~/.claude/skills/implement/` and `~/.claude/skills/improve-workflow/`.
+Invoke them with `/implement` and `/improve-workflow`.
+See the [official skill documentation](https://code.claude.com/docs/en/skills).
+
+Without uv, use `python3 scripts/install.py` with Python 3.11+.
+To install only one skill, pass its name: `uv run scripts/install.py implement`
+or `uv run scripts/install.py improve-workflow`. These are optional alternatives,
+not additional setup steps. uv runs the checked-out installer; this is not a
+Python package installed with `uv pip` or `uv tool install`.
 
 Start a new Claude Code session after installing, or explicitly ask an existing coordinator to reread the updated skill. Already-running subagents retain their original briefs.
 
@@ -97,10 +115,10 @@ Start a new Claude Code session after installing, or explicitly ask an existing 
 Use an explicit destination from the collection checkout:
 
 ```sh
-python3 scripts/install.py implement --skills-dir /absolute/path/to/project/.claude/skills
+uv run scripts/install.py --skills-dir /absolute/path/to/project/.claude/skills
 ```
 
-This makes the skill part of that project's skill directory. Review before committing the installed files to a project. Pick personal or project installation deliberately to avoid stale duplicate copies.
+This installs both skills into that project's skill directory. Review before committing the installed files to a project. Pick personal or project installation deliberately to avoid stale duplicate copies.
 
 ## Model policy
 
@@ -128,11 +146,13 @@ From your collection checkout:
 
 ```sh
 git pull --ff-only
-python3 scripts/install.py implement --replace
-python3 scripts/install.py improve-workflow --replace
+uv run scripts/install.py --replace
 ```
 
-Replacement moves the old installed skill to a timestamped backup under a sibling `.skill-backups/` directory, outside skill discovery. It installs the new copy and prints the backup path. If local changes matter, compare them before replacing. The installer refuses a symlink destination.
+The default update replaces both skills. Add a skill name to update only that skill.
+Without uv, use `python3 scripts/install.py --replace`.
+
+Replacement moves each old installed skill to a timestamped backup under a sibling `.skill-backups/` directory, outside skill discovery. It installs the new copy and prints the backup path. If local changes matter, compare them before replacing. The installer refuses a symlink destination.
 
 To restore, stop relevant agents, move the current `<skill-name>` directory aside, then move the printed backup back to `<skills-dir>/<skill-name>`. To uninstall either skill, move its directory out of the skills directory. Your separate run history under `~/.claude/implement/` remains intact.
 

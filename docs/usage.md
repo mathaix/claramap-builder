@@ -10,12 +10,12 @@ SpecStory work together and what the AgentSkill package contains.
 
 ## 1. Install and check access
 
-Follow [installation](installation.md#personal-installation) to install `implement`.
+Follow [installation](installation.md#personal-installation) to install both skills in one command.
 You need authenticated Claude Code, Python 3.11+, Git, SpecStory, and access to the
 [configured independent reviewer](installation.md#model-policy). Codex CLI and an
 allowed worker model are needed if Claude delegates work to Codex.
 
-The installer copies the skill; it does not install or authenticate these dependencies.
+The installer copies the skills; it does not install or authenticate these dependencies.
 
 ## 2. Start in your project
 
@@ -84,6 +84,6 @@ and reuses evidence that remains valid. See [recovery details](../skills/impleme
 
 ## Improve the next build
 
-Install the companion `improve-workflow` skill when you want to investigate how a run
+Use the included companion `improve-workflow` skill to investigate how a run
 went. Ask it to explain repeated checks, slow handoffs, or missing verification, then
 apply the changes you choose. Start with the [workflow improvement guide](improve-workflow.md).
