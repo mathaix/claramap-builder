@@ -4,12 +4,11 @@
 
 **Agent Skills to Orchestrate Code Development.**
 
-**Claramap Builder is an open-source agent skill that orchestrates software development with Claude Code and Codex.**
-Install it in your coding harness and invoke `/implement` with a goal. It breaks the
-goal into manageable tasks, gives each worker the context it needs, and selects
-models based on task complexity. It validates what comes back, integrates the
-changes, and iterates until the requested behavior is implemented and the required
-checks pass.
+**Claramap Builder is an open-source AgentSkill that gives code development a chief of staff.**
+Install it in your coding harness and invoke `/implement` with a goal. Claude Code
+coordinates specialist subagents: they investigate, plan, code, test, and review.
+The chief assigns scoped work, selects models for its complexity, reconciles results,
+and directs integration and repairs until the required checks and review pass.
 
 The skill bundles instructions, references, spec templates, and executable helpers.
 The current implementation runs on **Claude Code, Codex, and SpecStory**, with
@@ -19,6 +18,37 @@ The AgentSkill format can be adapted to other coding harnesses; the shipped setu
 uses Claude Code as its host. See [harness support](docs/architecture.md#agent-skill-packaging-and-harness-support).
 
 [Install the skill](docs/usage.md) · [How it works](docs/implement.md) · [Architecture](docs/architecture.md)
+
+## The chief-of-staff pattern
+
+One agent doing everything accumulates source reads, tool output, test failures, and
+abandoned attempts in the same context. As a task grows, that history can crowd out
+the decisions that matter. Claramap separates coordination from execution: the chief
+keeps the goal, constraints, decisions, and progress; specialists work in separate
+contexts with only the instructions and evidence relevant to their assignments.
+
+| Role | Responsibility |
+| --- | --- |
+| Chief of staff | Break down the goal with planner findings, assign work, reconcile evidence, and report the result |
+| Planner | Inspect the codebase and produce a grounded plan and task breakdown |
+| Coder | Implement a scoped change and return its revision and focused check evidence |
+| Test-runner | Execute and interpret checks; report failures without silently fixing the product |
+| Reviewer | Check the integrated diff against the original intent and identify defects and regression risks |
+
+The chief delegates codebase investigation, product edits, and test execution by
+default. Small fixes still use a scoped coder and independent review; every role
+does not need a separate agent on every task. Any direct-work exception must be
+explained before acting, recorded with evidence, and disclosed in the final report.
+
+Workers return concise summaries and pointers to their available execution traces.
+Tool events, transcripts, and check logs stay on disk; the chief reads relevant excerpts
+when needed instead of loading every trace into its context. Capture gaps remain explicit.
+
+This approach draws on Anthropic's [chief-of-staff cookbook](https://platform.claude.com/cookbook/claude-agent-sdk-01-the-chief-of-staff-agent),
+particularly specialist subagents and separate contexts. Claramap remains a skill
+for an existing harness; it does not require the cookbook's SDK application. The
+coordinator boundary is an instruction and audit requirement, not a tool-level
+restriction enforced by the installer. See [Architecture](docs/architecture.md#chief-of-staff-responsibilities-and-context).
 
 ## Why I built this
 
@@ -30,10 +60,10 @@ inspect, and improve. Three goals shaped it:
    the tools I use. The current implementation connects Claude Code and Codex;
    adapting another harness means wiring its execution and review capabilities.
 
-2. **Use a powerful orchestrator and delegate to specific subagents.** Keep the full
-   goal and project context with a capable coordinator. Give each subagent a scoped
+2. **Use a powerful orchestrator and delegate to specific subagents.** Keep the goal, constraints,
+   and key decisions with a capable coordinator while isolating detailed execution context. Give each subagent a scoped
    task, the context it needs, and a model matched to the work's complexity. The
-   orchestrator validates what comes back, integrates it, and drives the next iteration.
+   orchestrator reconciles the evidence, directs integration, and drives the next iteration.
 
 3. **Capture the work so I can improve the workflow.** Preserve conversations,
    worker attempts, check results, and review findings. Use those records to understand
@@ -78,7 +108,7 @@ build; `scripts/install.py` only copies Claramap Builder's skill files.**
 | Project | What it is and how we use it | Install beforehand? |
 | --- | --- | --- |
 | [Claude Code](https://github.com/anthropics/claude-code) | Anthropic's terminal coding agent. Hosts the skill, coordinates tasks and repairs, and runs a separate agent for independent review. | **Yes.** Install and authenticate; ensure access to the configured reviewer. [Setup](https://code.claude.com/docs/en/overview). |
-| [Codex CLI](https://github.com/openai/codex) | OpenAI's terminal coding agent. Runs scoped workers with relevant context and a model selected for task complexity. | **Yes for delegated builds.** Install and authenticate before launching workers. Direct Claude tasks do not launch Codex. [Setup](https://github.com/openai/codex#quickstart). |
+| [Codex CLI](https://github.com/openai/codex) | OpenAI's terminal coding agent. Runs scoped workers with relevant context and a model selected for task complexity. | **Yes for Codex workers.** Install and authenticate for Codex workers. Native Claude agents provide the configured review and capability fallback; the chief does not code by default. [Setup](https://github.com/openai/codex#quickstart). |
 | [SpecStory CLI](https://github.com/specstoryai/getspecstory) | A tool that saves AI coding conversations as local Markdown. Captures coordinator and worker history for recovery and workflow analysis. | **Yes.** Install its CLI and enable capture before starting the documented workflow. [Setup](https://docs.specstory.com/integrations/terminal-coding-agents). |
 | [SpecFlow](https://github.com/specstoryai/specflow) | SpecStory's methodology for building with software agents: intent, roadmap, tasks, execution, and refinement. Informs the workflow, task ownership, and context supplied to workers. | **No.** A workflow influence; the feature-spec templates are based on Kiro and EARS. [Method guide](https://www.specflow.com/getting-started.html). |
 
@@ -91,7 +121,7 @@ how the components connect.
 
 ### One-time setup
 
-Install and authenticate Claude Code, Codex CLI (for delegated builds), and SpecStory
+Install and authenticate Claude Code, Codex CLI (for Codex workers), and SpecStory
 as listed above. Ensure Git and Python 3.11+ (`python3` on PATH) are available.
 Kiro/EARS inform the spec templates; SpecFlow informs the workflow. Neither needs installation.
 
@@ -132,17 +162,18 @@ installation, and upgrading the skill.
    preserve account permissions, and verify that it survives a page reload.
    ```
 
-3. **Build and iterate.** Claude inspects the code, creates specs where needed, and
-   breaks the goal into scoped work. It gives workers relevant context, selects models
-   for task complexity, validates returned work, and integrates the changes. Failed
-   checks and blocking review findings return for repair; missing access or unresolved
-   requirements remain explicit blockers.
+3. **Delegate and iterate.** The chief uses a planner's findings to scope the work
+   and commission specs where needed. Coders implement changes; assigned workers run
+   checks; an independent reviewer examines the integrated result. The chief evaluates
+   their summaries and evidence, directs integration, and assigns repairs. Missing
+   access or unresolved requirements remain explicit blockers.
 
 4. **Inspect the result.** Review the changed code, check results, independent review
    findings, and remaining gaps. Larger changes include requirements, design, and task
    progress in **your product repository at `specs/<slug>/`**. Run evidence stays in
    `~/.claude/implement/`, and conversations in the worktree's `.specstory/history/`.
-   See [Where files live](docs/architecture.md#where-files-live).
+   Each run's `execution.md` identifies executors, trace locations, and any direct-work
+   exceptions. See [Where files live](docs/architecture.md#where-files-live).
 
 5. **Commit and publish through your project workflow.** Have the coordinator perform
    authorized Git and PR actions, or handle them yourself. Commit product specs with
@@ -197,6 +228,12 @@ The installed agent instructions live in [implement](skills/implement/SKILL.md) 
 
 Claramap Builder combines existing ideas with its own orchestration and verification
 helpers. Credit for the foundations belongs to:
+
+- **[Anthropic's chief-of-staff cookbook](https://platform.claude.com/cookbook/claude-agent-sdk-01-the-chief-of-staff-agent):**
+  an example of specialist subagents with separate contexts. Claramap adopts the
+  orchestration pattern through skills and existing harness tools, rather than
+  bundling the SDK application. Its delegation-first boundary and exception records
+  are Claramap policy.
 
 - **[Kiro](https://kiro.dev/docs/specs/feature-specs/):** the three-file feature-spec
   layout (`requirements.md`, `design.md`, `tasks.md`), EARS-based requirements,

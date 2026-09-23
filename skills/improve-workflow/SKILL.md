@@ -71,6 +71,7 @@ Do not load every transcript or replay every check by default.
 | Evidence | What to learn from it | Limit |
 | --- | --- | --- |
 | `specs/<slug>/` in the product repo, task briefs | Intended scope, decisions, assigned work, reported outcomes | Summaries can be stale or approximate |
+| `execution.md`, actual agent/session identities, and direct-work exceptions | Who planned, coded, tested, and reviewed; why the chief acted directly; trace coverage | Coordinator assertions need supporting tool events; older runs may lack this record |
 | `recovery.json` and current Git state | Observed revision, workers, next action, unfinished work | A saved snapshot is not a live monitor |
 | `attempt-*.json` and worker events | Actual execution intervals, exits, retries, usage | Worker success alone is not acceptance |
 | Check records and logs | Commands, input fingerprints, environment, durations, failures | Coverage is limited to declared inputs and exercised behavior |
@@ -92,6 +93,27 @@ sample sizes and distinguish initial attempts, retries, interruptions, and scope
 Use medians/ranges when appropriate; a single faster run does not establish a trend.
 Deduplicate cumulative usage by session/agent identity, including repeated exports.
 Cached tokens are a subset of input tokens. Do not infer billed dollars from token counts.
+
+## Audit chief-of-staff delegation
+
+When reviewing implement runs, compare assignments in `execution.md` and specs with
+actual agent identities, tool events, and changed revisions. Separate coordinator
+recordkeeping and authorized orchestration commands from direct code investigation,
+product edits, and test execution. Empty Codex worker records do not exclude native
+subagents; an independent reviewer does not prove coding was delegated.
+
+For each direct-work exception, check whether the chief explained it before acting,
+recorded supporting evidence and alternatives, limited its scope, and preserved
+checks and independent review. A small diff or presumed speed is not by itself a
+justification. For older runs without a reason, report "reason not recorded" rather
+than inventing one or applying a later rule retroactively.
+
+Check context handling too: do workers get bounded briefs, return concise outcomes,
+and preserve available traces externally? Identify repeated source exploration or
+full transcripts pulled into the chief only when the records demonstrate it. Missing
+capture is an evidence gap, not proof of no delegation or poor context management.
+Report explained exceptions separately from unexplained direct work; compare coverage
+and results on comparable runs before claiming the pattern improved performance.
 
 ## Choose improvements from evidence
 

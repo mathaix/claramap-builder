@@ -41,11 +41,15 @@ separate worktrees and how to confirm worker sessions are captured.
 reload. Reproduce the bug, preserve existing account permissions, and verify the fix.
 ```
 
-Include known constraints and acceptance criteria. Claude inspects the project,
-breaks down the work, and chooses direct implementation or scoped workers. Delegated
-workers receive relevant context and a model selected for the task's complexity.
-Claude validates and integrates their results, addresses failures, and obtains an
-independent review.
+Include known constraints and acceptance criteria. Claude acts as chief of staff:
+it delegates investigation and planning, then assigns scoped implementation and checks.
+Workers receive relevant context and a model selected for the task's complexity.
+The chief reconciles their results, directs integration and repairs, and obtains an
+independent review. A small fix can use one coder plus the independent reviewer.
+
+The chief does not code by default. Any direct-work exception must be explained before
+acting, recorded with evidence and alternatives, and disclosed in the final report.
+See the [chief-of-staff architecture](architecture.md#chief-of-staff-responsibilities-and-context).
 
 You can steer the work with existing specs, model preferences, budget constraints,
 and environment access. Those constraints remain in force throughout the run.
@@ -53,13 +57,15 @@ and environment access. Those constraints remain in force throughout the run.
 ## 4. Inspect the result
 
 The final report explains the delivered behavior, checks performed, review outcome,
-and remaining limitations. A successful worker exit alone does not establish completion.
+executor assignments, any direct-work exceptions, and remaining limitations.
+A successful worker exit alone does not establish completion.
 Required checks and independent review must pass; unavailable access or evidence stays
 explicitly pending.
 
 | Record | Where to find it |
 | --- | --- |
 | Requirements, design, and task progress for larger changes | `specs/<slug>/` in your project |
+| Assignment identities, trace pointers, capture gaps, and exceptions | `<run-dir>/execution.md`, maintained by the chief |
 | Worker attempts, review snapshots, and recovery state | `~/.claude/implement/<project>-<slug>/` by default |
 | Captured conversation history | `.specstory/history/` in the relevant worktree |
 

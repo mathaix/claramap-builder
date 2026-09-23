@@ -12,11 +12,14 @@ On resume:
    commits must remain ancestors of HEAD. It is an observation, not a monitor.
 2. Inspect worker locks before dispatch or resume. Missing final metadata means
    interrupted or unknown, not success.
-3. Resume remaining work in the same task, keeping partial edits and valid evidence. The
+3. Read `execution.md` for native-agent identities, evidence pointers, open assignments,
+   and direct-work exceptions; wrapper discovery does not track every native agent.
+   Reconcile with available task handles before any resume or replacement dispatch.
+4. Resume remaining work in the same task, keeping partial edits and valid evidence. The
    wrapper recovers session identity from events and rejects conflicting IDs. Without an
    identity, use a new task slug that references the partial work; never overwrite the
    old task. Preserve model pins and owner restrictions.
-4. Reread `specs/<slug>/` for open tasks, deferred findings, and the recorded design-review
+5. Reread `specs/<slug>/` for open tasks, deferred findings, and the recorded design-review
    status. Rerun interrupted, failed, or invalidated checks, not every check. Complete
    independent final review and required checks before publishing.
 

@@ -2,7 +2,7 @@
 
 [Claramap Builder](../README.md) · [Your first build](usage.md) · [Installation](installation.md)
 
-Claramap Builder packages its orchestration workflow as an AgentSkill: instructions,
+Claramap Builder packages a chief-of-staff workflow as an AgentSkill: instructions,
 references, templates, and helpers that a coding harness can load. The current
 implementation uses Claude, Codex, and SpecStory. Feature-spec templates are based on
 Kiro and EARS; SpecFlow informs the surrounding planning and refinement workflow. Each serves a different part of the development loop.
@@ -16,7 +16,7 @@ or start session capture.
 | Project | What it is | Required setup |
 | --- | --- | --- |
 | [Claude Code](https://github.com/anthropics/claude-code) | Anthropic's terminal coding agent, used here as coordinator and independent reviewer. | Install and authenticate before running the skill. Confirm access to the reviewer selected by the model policy. |
-| [Codex CLI](https://github.com/openai/codex) | OpenAI's terminal coding agent, used here for delegated workers. | Install and authenticate before delegated builds. Not needed for direct Claude work or reading existing run evidence. |
+| [Codex CLI](https://github.com/openai/codex) | OpenAI's terminal coding agent, used here for delegated workers. | Install and authenticate for Codex workers. Native Claude agents provide configured review and capability fallback. Reading existing run evidence does not need a Codex worker. |
 | [SpecStory CLI](https://github.com/specstoryai/getspecstory) | A conversation capture tool that exports coding-agent sessions to local Markdown. | Install before starting the documented workflow, then enable capture for the relevant sessions. |
 | [SpecFlow](https://github.com/specstoryai/specflow) | SpecStory's structured methodology for development with software agents. | No installation. A workflow influence, not the source of the Kiro/EARS feature-spec templates. |
 
@@ -31,9 +31,13 @@ methodology, not the unrelated .NET testing framework.
 Select the image to view it at full size.
 
 The numbered row shows a delegated build: Claude scopes the goal, Codex workers
-execute contextual tasks, Claude validates and integrates, and an independent Claude
-agent reviews the result. Failed checks or blocking findings return for repair.
-Small tasks can go directly from Claude implementation to validation without Codex.
+execute contextual tasks, the chief evaluates verification evidence and directs
+integration, and an independent Claude agent reviews the result. Failed checks or
+blocking findings return to a worker for repair. The validation/integration stage
+denotes responsibility for acceptance; it does not assign product coding to the chief.
+Native Claude agents provide independent review and the configured local-capability
+fallback; ordinary workers use the policy's allowlisted models. A native dispatch
+interface is valid when it supports the selected role/model.
 
 The image's SpecFlow card represents a workflow influence. Kiro and EARS supply
 the feature-spec structure; SpecFlow informs planning, task ownership, worker
@@ -42,6 +46,70 @@ while the helpers and coordinator retain execution records. Both feed
 `/improve-workflow` when requested. Capture must be configured for the relevant
 sessions; improvements are applied only when requested. Completion requires passing
 checks and approved content. Missing permissions, capabilities, or proof stay explicit.
+
+## Chief-of-staff responsibilities and context
+
+The chief owns the development goal, acceptance criteria, assignment decisions,
+dependencies, and final report. Specialists own detailed execution. This reduces the
+source reads, failed attempts, and raw tool output the chief must carry while making
+cross-task decisions. It does not guarantee lower cost, faster completion, or better
+results; those outcomes need evidence from comparable runs.
+
+| Role | Works with | Returns to the chief |
+| --- | --- | --- |
+| Planner | Relevant code, repository rules, existing specs, and constraints | Findings, proposed design/task breakdown, risks, and source references |
+| Coder | A scoped brief, owned paths, acceptance criteria, and an isolated or serialized checkout | Changed revision, focused checks, remaining issues, and trace pointers |
+| Test-runner | Named revision, required scenarios, and an authorized test environment | Commands, outcomes, logs, and failures to assign for repair |
+| Reviewer | Integrated diff, original intent/specs, and check evidence | Independent findings and a verdict identifying the reviewed content |
+| Chief of staff | Compact plans, assignments, summaries, evidence references, and open decisions | Next assignments, acceptance decisions, progress, and final report |
+
+Roles can be combined where useful: a coder can investigate a small fix and run its
+focused tests. Independent review remains separate from implementation. Parallelism
+is optional; separate context is useful even when workers execute sequentially.
+
+### Summaries in context, traces on disk
+
+Each assignment gets the minimum relevant context, not a copy of the chief's entire
+conversation. Workers return a compact result and pointers to their available tool
+traces, captured conversations, check logs, and artifacts. The chief retrieves bounded
+evidence to resolve a question. Returning every full trace inline would defeat the
+context boundary. "Trace" means observable execution records, not hidden model reasoning;
+missing subagent exports must be reported, not represented as complete capture.
+
+The coordinator maintains `<run-dir>/execution.md` for every run, identifying tasks,
+roles, actual agent/session IDs, revisions, results, evidence/trace paths, and capture
+gaps. Codex attempt files support that record; native-agent assignments need their own
+identity and evidence pointers. An empty wrapper worker table does not establish
+that no native agents ran.
+
+### Direct-work exceptions
+
+The chief delegates codebase investigation, spec authorship, product edits, tests,
+and integration repairs. It can read governing instructions and concise reports,
+maintain coordination records, and run orchestration helpers or authorized Git actions.
+Those operations must not conceal product edits or conflict resolution.
+
+Before any direct product work, state and record a concrete justification, evidence,
+alternatives considered, the bounded action, and its check/review plan. An explicit
+user direction or a demonstrated capability/delegation limitation may qualify; speed,
+small scope, or existing context alone does not. Report exceptions at completion.
+If no authorized route exists, report the blocker. Full policy and the record format
+are in [chief-of-staff instructions](../skills/implement/references/chief-of-staff.md).
+
+### Cookbook influence and enforcement limits
+
+Anthropic's [chief-of-staff cookbook](https://platform.claude.com/cookbook/claude-agent-sdk-01-the-chief-of-staff-agent)
+demonstrates specialist subagents with separate conversation histories and tools,
+and hooks for deterministic actions. Claramap applies those architectural ideas as
+instructions in an existing harness. It does not copy the cookbook's application or
+require the Claude Agent SDK. Its default prohibition on coordinator product work
+is Claramap's policy; the cookbook also demonstrates direct tool use.
+
+The skill and execution record establish an instruction and audit contract. The
+installer does not configure hooks or remove coordinator tools; the existing review
+gate checks reviewed content and verdict identity, not who authored every change.
+Hard restrictions on coordinator writes, including shell-based edits, would require
+additional harness-specific controls. Such enforcement is not shipped here.
 
 ## Where files live
 
@@ -75,6 +143,7 @@ worker, check-log, and review directory names are chosen per run.
 └── ...                                 # Your product source and tests
 
 ~/.claude/implement/my-app-display-name/ # Local execution evidence for this run
+├── execution.md                        # Coordinator-maintained assignments, traces, exceptions
 ├── task-01/                            # Example worker record directory
 │   ├── workdir                         # Path to the worker's actual code checkout
 │   ├── events-1.jsonl                  # Worker events
@@ -92,7 +161,8 @@ worker, check-log, and review directory names are chosen per run.
 
 | Files | Who creates or updates them | Git treatment |
 | --- | --- | --- |
-| `specs/<slug>/requirements.md`, `design.md`, `tasks.md` | The coordinator scaffolds and fills them, then maintains them as the work changes. | Commit and review with the product code. Link existing specifications rather than duplicating them. |
+| `specs/<slug>/requirements.md`, `design.md`, `tasks.md` | A planner or assigned worker writes them; the chief reconciles decisions and assigns updates. | Commit and review with the product code. Link existing specifications rather than duplicating them. |
+| `execution.md` | The chief records assignments, identities, evidence pointers, capture gaps, and direct-work exceptions. | Keep in the local run folder, including runs without specs. |
 | Worker records, check logs, review snapshots, and recovery files | The worker wrapper and review/recovery helpers create their records; the coordinator records checks and saves reviewer replies. | Keep in the local run folder outside the product worktree. |
 | `.specstory/history/` | SpecStory, when capture is running for that worktree. | Keep raw conversations local; exclude `.specstory/` through the product's ignore or local exclude rules. |
 | Installed skill files | `scripts/install.py` copies them from the maintained source. | Personal installations live outside the product repo. A project installation in `.claude/skills/` may be committed deliberately for the team. |
@@ -100,6 +170,7 @@ worker, check-log, and review directory names are chosen per run.
 For small, settled changes, a spec folder is optional. The request and commit message
 can carry the acceptance criteria. For larger changes, `tasks.md` is the place to
 look for remaining work; keep bulky logs in the run folder and reference their paths.
+A small task still uses delegation and an execution record even when no spec folder is needed.
 
 ### How the locations connect
 
@@ -110,7 +181,7 @@ run, such as `my-app-display-name/task-01`.
 
 A worker's record directory is separate from its code checkout. Parallel coding
 workers use isolated Git worktrees; the coordinator chooses their locations and
-integrates their changes into the product worktree. Capture conversations in each
+assigns integration into the product worktree to a worker, including conflict resolution. Capture conversations in each
 worktree that hosts relevant activity.
 
 `IMPLEMENT_ROOT` changes the wrapper's default `~/.claude/implement` root. Supply
@@ -124,17 +195,18 @@ records. Recovery files are snapshots, not live monitors; inspect worker locks a
 actual results before continuing. SpecStory supplies conversation context and does
 not by itself prove that a check passed or an interrupted worker stopped.
 
-## Claude: coordinate, integrate, and review
+## Claude: chief of staff and independent specialists
 
 [Claude Code](https://github.com/anthropics/claude-code) hosts `/implement` and holds the full development goal. The coordinator
-inspects the project, establishes requirements, breaks work into scoped tasks, and
-chooses models and reasoning effort according to complexity, risk, and your policy.
+establishes the outcome, delegates project investigation and detailed planning, and
+uses returned findings to assign scoped tasks. It chooses models and reasoning effort
+according to complexity, risk, and your policy.
 It gives workers relevant context, allowed changes, and acceptance criteria.
 
-When results return, Claude inspects the changes and evidence, integrates the work,
-and routes failed checks or review findings back into repair. It can implement a
-small, settled change directly. Coding, diagnosis, verification, and QA are available
-assignments chosen for the task.
+When results return, the chief reconciles summaries and evidence, directs integration,
+and routes failed checks or review findings to repair workers. Planning, coding,
+diagnosis, verification, and QA are delegated responsibilities chosen for the task.
+The chief does not silently take over implementation when a worker fails.
 
 A separate Claude agent performs independent final review. The shipped
 [model policy](../skills/implement/model-policy.json) selects Claude Opus for that
@@ -161,8 +233,10 @@ A successful process exit means the worker finished running. Claude still needs 
 validate the returned work and its checks before accepting it. Independent coding
 work uses isolated worktrees and is integrated before final verification.
 
-Codex is part of the delegated implementation path. A direct Claude change or an
-audit of existing records does not need to launch a Codex worker. See
+Codex is the bundled ordinary-worker execution path. Native Claude review and
+capability fallback do not launch a Codex worker; neither does an audit of existing
+records. Native delegation still requires scoped instructions, an actual agent
+identity, and retained evidence. Changing an interface does not expand model permission. See
 [worker dispatch](../skills/implement/references/delegation.md).
 
 ## SpecStory: capture the conversation
@@ -217,7 +291,7 @@ defining the feature-spec file layout.
 | Plan | The design records the approach, decisions, and open questions. |
 | Scoped tasks | Tasks identify the requirement they serve, files, executor, and check. |
 | Contextual execution | Worker briefs provide relevant project context, constraints, and expected results. |
-| Refinement | The coordinator validates results, repairs defects, and updates remaining work. |
+| Refinement | The chief evaluates results, assigns defect repairs, and updates remaining work. |
 
 The [bundled spec format](../skills/implement/references/spec-format.md) combines
 this methodology with Kiro's three-file feature-spec layout and EARS requirements.

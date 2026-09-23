@@ -9,6 +9,15 @@ Evidence: source files and known gaps; distinguish current observations from sav
 | --- | --- | --- | --- |
 | Fill only evidence-backed findings | Separate inference from fact | Smallest useful action | Required behavior or verification |
 
+## Delegation and context
+
+Which tasks used planner, coder, test-runner, and reviewer agents? Link actual identities
+and available traces. Distinguish operational coordinator actions from direct product
+work. For each exception, was its reason/evidence/scope recorded before acting and
+reported afterward? Mark absent rationale or capture as unknown; native agents may not
+appear in wrapper records. Note evidence of excessive context transfer or repeated
+exploration, without assuming context quality from token totals alone.
+
 ## Timing and comparison
 
 Give comparable sample sizes and observed elapsed time. Separate agent-work totals from

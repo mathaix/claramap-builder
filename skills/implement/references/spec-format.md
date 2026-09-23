@@ -42,4 +42,5 @@ Evidence stays under `~/.claude/implement/<repo>-<slug>/`: worker attempts, revi
 snapshots and verdicts, `recovery.json`. Use the same `<slug>` in both places.
 
 A small, settled change needs no spec folder; state the criteria in the request and the
-commit message. Delete a spec folder in the PR that makes it stale.
+commit message. Delegation and `<run-dir>/execution.md` still apply when no spec folder
+is needed. Delete a spec folder in the PR that makes it stale.

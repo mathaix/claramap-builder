@@ -6,6 +6,13 @@ task, including judgment and repair, within the required quality and owner budge
 effort, independent reviewer, and local capability fallback. The wrapper enforces the
 allowlist; Claude selects the reviewer and fallback through its native interface.
 
+Dispatch interface and model permission are separate. An ordinary planner, coder,
+test-runner, or integrator uses an allowlisted worker model, whether dispatched through
+the wrapper or a native interface capable of selecting that model. Native Claude
+availability does not expand the worker allowlist: Claude Opus is the configured reviewer
+and Claude Sonnet the local-capability fallback. Use those routes under their stated
+conditions; do not silently replace a Codex worker with an arbitrary native model.
+
 Only an explicit owner-authorized policy change may alter those settings: edit the file in
 the maintained source, test, reinstall. Environment overrides select within the allowlist
 and cannot expand it. A genuine user pin takes precedence within the permitted set; a pin

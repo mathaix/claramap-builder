@@ -38,6 +38,8 @@ the review base for comparison. Avoid editable installs that import from the wri
 checkout. Revalidate the reviewed tree after commit hooks and before publishing; if you
 commit after the snapshot, verify first and compare `HEAD^{tree}` to the manifest after.
 
-On CHANGES, fix the concrete blocking defects; coordinator repairs are allowed. After two
-failed repairs, reassess cause, scope, or evidence instead of another round. A workflow
+On CHANGES, assign the concrete blocking defects to a coder or integration agent.
+Coordinator product repairs require the recorded [direct-work exception](chief-of-staff.md#direct-work-exceptions);
+review findings do not themselves grant an exception. After two failed repairs, reassess
+cause, scope, or evidence instead of another round. A workflow
 change never turns an open finding into approval.

@@ -30,9 +30,9 @@ or start SpecStory capture.
 2. Install and authenticate **[Claude Code](https://github.com/anthropics/claude-code)**,
    Anthropic's terminal coding agent, using its [setup guide](https://code.claude.com/docs/en/overview).
    It hosts the skill and coordinates work. Confirm access to the configured independent reviewer.
-3. For delegated builds, install and authenticate **[Codex CLI](https://github.com/openai/codex)**,
+3. For Codex workers, install and authenticate **[Codex CLI](https://github.com/openai/codex)**,
    OpenAI's terminal coding agent, following its [quickstart](https://github.com/openai/codex#quickstart).
-   It executes scoped worker tasks. A direct Claude task or an audit of saved records does not need a Codex worker.
+   It executes scoped worker tasks. Native Claude agents supply configured review and capability fallback. An audit of saved records does not need a Codex worker.
 4. Install **[SpecStory CLI](https://github.com/specstoryai/getspecstory)**, which exports
    AI coding conversations as Markdown for recovery and analysis. Follow the
    [CLI installation guide](https://docs.specstory.com/integrations/terminal-coding-agents).
@@ -52,7 +52,7 @@ for background.
 See [architecture](architecture.md) for each component's role and
 the connections between planning, execution, review, and capture.
 
-Check the setup (the `codex` check applies when using delegated workers):
+Check the setup (the `codex` check applies when using Codex workers):
 
 ```sh
 python3 --version
@@ -63,10 +63,12 @@ specstory version
 specstory check
 ```
 
-Both skills are installed by default. Implement can handle small changes directly in
-Claude; it needs Codex only when delegating to Codex workers. Improve-workflow can analyze
+Both skills are installed by default. Implement delegates product work, including
+small changes, to scoped agents; it needs Codex when using the bundled worker wrapper.
+The host must provide a permitted delegation route and independent review.
+The chief must explain and record any direct-work exception; missing worker access
+is not permission to silently implement the task itself. Improve-workflow can analyze
 existing records without launching workers and adds no fixed model requirement of its own.
-
 
 ## Run Claude and Codex through SpecStory
 

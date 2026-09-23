@@ -8,6 +8,8 @@ It recommends changes and can update the relevant skills and tools when requeste
 
 Use it to investigate concrete questions:
 
+- Why did the chief implement directly, and was the exception explained before acting?
+- Did workers receive scoped context and return summaries with trace references?
 - Why did a small fix take an hour?
 - Did multiple workers repeat the same checks on unchanged code?
 - Where did handoffs or environment failures hold up the build?
@@ -31,11 +33,18 @@ The skill reads relevant summaries first, then checks attempts, test records, re
 | Source | What it contributes |
 | --- | --- |
 | `specs/<slug>/` in the product repository | Requirements, design decisions, tasks, and recorded progress |
-| `~/.claude/implement/<project>-<task>/` | Run status, worker attempts, check evidence, review outcomes, and recovery state from implement |
+| `~/.claude/implement/<project>-<task>/` | `execution.md` assignments and exceptions, run status, worker attempts, checks, reviews, and recovery state |
 | `.specstory/history/` in the product worktree | Captured conversation history: changed requests, handoffs, and waits |
 | Relevant source and Git state | The instructions, tools, and revisions behind the reported behavior |
 
 SpecStory is required by this setup and should capture the Claude and Codex sessions being reviewed. If an older run has no captured history, analyze the available evidence and state that limitation; missing history cannot be reconstructed from summary reports alone. Keep real reports and transcripts local. See the [SpecStory and evidence guide](../skills/improve-workflow/references/specstory.md) for capture commands, timing limits, and the feedback diagram.
+
+When auditing delegation, distinguish direct product work from coordinator recordkeeping.
+Check actual agent/session identities and events, including native subagents. An empty
+Codex worker table is not proof of no delegation; a review agent is not proof of a coding
+agent. If an older run lacks a reason for direct work, report that gap rather than infer
+one. The [chief-of-staff policy](../skills/implement/references/chief-of-staff.md) defines
+the default and exception requirements for new runs.
 
 ## Apply an improvement
 

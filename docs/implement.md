@@ -3,9 +3,9 @@
 [Claramap Builder](../README.md) · [Your first build](usage.md) · [Installation and configuration](installation.md)
 
 `/implement` is Claramap Builder's primary command. It turns a goal into scoped work,
-coordinates execution, and validates the integrated result. Claude Code holds the
-full goal and makes orchestration decisions; Codex workers take bounded assignments
-when delegation is useful.
+coordinates execution, and evaluates evidence for the integrated result. Claude Code
+acts as chief of staff; Codex workers and native review/fallback agents take bounded
+assignments in separate contexts under the configured model policy. Product work is delegated by default, including small fixes.
 
 ![Claude coordinates workers and integrates a verified result](../skills/implement/assets/claramap-builder-hero.png)
 
@@ -31,10 +31,10 @@ request, run record, check evidence, review verdict, and final response.
 
 ## From goal to completed change
 
-1. **Break down the goal.** Claude inspects the relevant code and constraints, establishes acceptance criteria, and identifies tasks with observable checks.
+1. **Ground and break down the goal.** The chief establishes intent and constraints, then delegates codebase investigation to a planner. The planner returns findings, a task breakdown, and evidence references; the chief settles assignments and acceptance criteria.
 2. **Delegate with context.** Each worker receives the relevant revision, code paths, requirements, allowed changes, and assigned checks. Independent coding work uses isolated worktrees.
-3. **Validate and integrate.** Claude inspects returned work, checks affected behavior, integrates changes, and obtains independent review of the final content.
-4. **Iterate to completion.** Failed checks and blocking review findings return to the coordinator for repair. After repeated failed repairs, it reassesses the cause and approach. Missing access or authorization is reported, and unproven work stays open.
+3. **Verify and integrate.** Assigned workers exercise affected behavior and integrate changes. The chief reconciles their evidence, commissions independent review of the final content, and decides whether acceptance criteria are met. Integration conflicts and product repairs remain worker assignments.
+4. **Iterate to completion.** Failed checks and blocking review findings return to the chief for assignment to a repair worker. After repeated failed repairs, it reassesses the cause and approach. Missing access or authorization is reported, and unproven work stays open.
 
 ## Match workers to the work
 
@@ -44,10 +44,28 @@ capability; subtle state, concurrency, or permission changes need stronger reaso
 Each brief records the selected model, effort, and reason, within your model policy
 and budget. See [model routing](../skills/implement/references/model-routing.md).
 
-Small, settled changes can be implemented directly. Coding, diagnosis, verification,
-and QA are available assignments. Separate design review is used for consequential
+A small fix can use one coder to investigate, implement, and run focused checks,
+followed by independent review. Larger work can separate planning, coding,
+test-running, diagnosis, and QA. These are responsibilities, not compulsory stages. Separate design review is used for consequential
 open questions or when required by you or the repository. Independent final review
 remains required.
+
+## Keep the chief focused
+
+The chief retains requirements, assignments, decisions, results, and unresolved risks.
+Workers retain detailed source exploration, attempts, and tool output in their own
+contexts. Their return includes a concise outcome, revision, checks, open issues,
+agent/session identity, and paths to available traces. The chief follows those paths
+for a specific uncertainty instead of ingesting every transcript. See
+[the architecture and cookbook reference](architecture.md#chief-of-staff-responsibilities-and-context).
+
+Direct product work is an exception. Before acting, the chief must state and record
+why delegation cannot serve that action, evidence for the reason, alternatives
+considered, scope, and the check/review plan. A user instruction, unavailable permitted
+delegation routes, or a necessary capability that cannot be delegated may justify it;
+"quick" or "already in context" does not. Normal authorization and independent review
+still apply. The [skill policy](../skills/implement/references/chief-of-staff.md) defines
+the boundary; no helper currently blocks coordinator edits mechanically.
 
 ## Keep the goal and progress recoverable
 
@@ -57,10 +75,13 @@ checkbox `tasks.md` that cites requirement IDs. It is committed and reviewed wit
 code. These bundled templates use [Kiro's feature-spec structure and EARS](../skills/implement/references/spec-format.md).
 SpecFlow informs the surrounding workflow and worker context.
 Execution records such as worker records,
-review snapshots, verdicts, and `recovery.json` stays under
+review snapshots, verdicts, `execution.md`, and `recovery.json` stay under
 `~/.claude/implement/<project>-<slug>/`. SpecStory conversation history lives under the
 worktree's `.specstory/history/`. See [Where files live](architecture.md#where-files-live)
 for the directory layout, who maintains each record, and what belongs in Git.
+Every run, including one without a spec folder, keeps `execution.md` with task
+assignments, actual agent identities, result/trace pointers, capture gaps, and
+any direct-work exceptions. The coordinator maintains it; helpers do not generate it.
 
 ## What the tools establish
 
