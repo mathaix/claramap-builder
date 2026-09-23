@@ -30,9 +30,41 @@ up front when a costly failure is foreseeable. Use only combinations available i
 installed client; do not make paid probe calls to rank models. If the selected model is
 unavailable, record it and choose another permitted model explicitly. Never silently fall back.
 
-Record in each brief: complexity and risk in one sentence, the exact model and effort
-with a short reason, and the reassessment trigger. Resume keeps the recorded settings
-unless the coordinator overrides them via `IMPLEMENT_MODEL` and `IMPLEMENT_EFFORT`.
+## Explain the choice before dispatch
+
+Before every new assignment or model change, give the user a concise routing explanation
+and save it in the brief and `<run-dir>/execution.md`. Several assignments may share one
+short update, but each needs its own rationale. State:
+
+- Task and role; exact model, effort (or not configurable), and native/wrapper route.
+- The task facts that justify that model: uncertainty, interactions, required capability,
+  and why the default/lightest suitable allowed worker is adequate or insufficient.
+- The policy entry authorizing the choice: worker allowlist, independent reviewer, or
+  capability fallback, with any explicit owner pin.
+- If Codex is bypassed, why: the configured independent-review role, or the specific
+  capability failure/limitation and evidence supporting the permitted fallback. Availability
+  of a native agent and labels such as "judgment tier" are not sufficient reasons.
+- The condition that would trigger reassessment or a different permitted selection.
+
+Example for an ordinary worker: "T2 database verification: Codex Terra, medium, through
+codex_task.sh. The task spans migrations and application writes, so it needs integration
+judgment beyond a mechanical Luna task. Terra is allowlisted. A confirmed local-capability
+restriction triggers the configured Sonnet fallback with the error recorded."
+
+Example for review: "T4 final review: Claude Opus through the native interface, effort
+not configurable here. The policy names Opus as independent reviewer; this is why this
+assignment does not use Codex. It receives the integrated snapshot and existing checks."
+
+If the choice has no valid policy basis, select a permitted route before dispatch.
+An explanation does not authorize a model outside policy. Do not manufacture a failure
+or make paid probe calls to justify a preferred model. Missing rationale from an older
+run remains "not recorded"; do not invent it retrospectively.
+
+Resume preserves the recorded settings unless explicitly changed via `IMPLEMENT_MODEL`
+and `IMPLEMENT_EFFORT`; unchanged resumes reference the existing decision. Explain and
+record any change before resuming. At completion, summarize models used and material
+routing changes, linking the ledger. This is an instruction/audit requirement; native
+dispatch is not mechanically guarded by the wrapper.
 
 After two failed repair attempts, reassess before another dispatch:
 - Codex local-capability denial: hand remaining local work to the configured fallback.

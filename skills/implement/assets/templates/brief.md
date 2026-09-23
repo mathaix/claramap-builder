@@ -7,7 +7,11 @@ Relevant context: {{MINIMUM_INTENT_PATHS_DECISIONS_DEPENDENCIES}}
 Task / requirement IDs: {{IDS_OR_ACCEPTANCE_REFERENCE}}
 Report / trace destination: {{RUN_DIR_ARTIFACT_PATHS}}
 Allowed writes/actions: {{OWNED_PATHS_OR_READ_ONLY_AND_TEST_ENVIRONMENT}}
-Model / effort / reason: {{PERMITTED_SELECTION_AND_OWNER_PINS}}
+Model / effort / dispatch route: {{EXACT_MODEL_EFFORT_OR_NOT_CONFIGURABLE_AND_ROUTE}}
+Policy basis / owner pin: {{WORKER_ALLOWLIST_REVIEWER_OR_FALLBACK_AND_PIN}}
+Selection reason: {{TASK_FACTS_AND_WHY_DEFAULT_OR_LIGHTER_ALLOWED_WORKER_IS_OR_IS_NOT_SUITABLE}}
+Why not Codex (if bypassed): {{REVIEW_POLICY_OR_CAPABILITY_EVIDENCE_ELSE_NOT_APPLICABLE}}
+Routing decision: {{EXECUTION_LEDGER_ENTRY}}
 
 Checks assigned to this executor: {{COMMANDS_AND_EXPECTED_RESULTS}}
 Existing evidence to reuse: {{RECORD_PATHS_OR_NONE}}

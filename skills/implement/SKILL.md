@@ -54,7 +54,11 @@ or serious unresolved risk, and keep independent work moving.
 
 Before dispatch read [model routing](references/model-routing.md) and
 [model-policy.json](model-policy.json). Pins are binding; never silently substitute a
-model. Brief workers with [delegation](references/delegation.md) and the
+model. Before each dispatch or model change, tell the user the task/role, selected
+model/effort, task-specific reason, and authorizing policy entry; explicitly explain
+any bypass of Codex with supporting evidence. Save that decision in the brief and
+`execution.md` before launching. A vague "judgment tier" is not a reason to ignore
+the allowlist. Brief workers with [delegation](references/delegation.md) and the
 [brief template](assets/templates/brief.md). Roles are tools, not compulsory stages, and
 a role grants no capability or permission.
 
@@ -102,7 +106,8 @@ After the final review passes, run `python3 <skill>/scripts/usage.py --run <run-
 It detects the current Claude session, sums tokens per model across Codex workers, the
 coordinator, and subagents, prints the table, and saves it as `<run-dir>/usage.md`.
 Include that table in the final response, report which work was delegated, and disclose
-any direct-work exception with its reason and evidence path. Tokens are not dollars.
+any direct-work exception with its reason and evidence path. Summarize the models used
+and material routing changes with their reasons. Tokens are not dollars.
 
 ## Tools
 

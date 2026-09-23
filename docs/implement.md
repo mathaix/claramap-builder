@@ -42,7 +42,11 @@ Model selection depends on uncertainty and interaction. A mechanical change with
 established example can use a lighter worker; ordinary integrations call for more
 capability; subtle state, concurrency, or permission changes need stronger reasoning.
 Each brief records the selected model, effort, and reason, within your model policy
-and budget. See [model routing](../skills/implement/references/model-routing.md).
+and budget. Before dispatch, the chief explains the chosen model and effort, the task
+facts behind the choice, and the policy entry permitting it. If it bypasses Codex,
+it must explain why with the review-role policy or capability evidence. The decision
+is saved in the brief and `execution.md`; the final report summarizes models and changes.
+A plausible explanation cannot authorize an out-of-policy model. See [model routing](../skills/implement/references/model-routing.md).
 
 A small fix can use one coder to investigate, implement, and run focused checks,
 followed by independent review. Larger work can separate planning, coding,

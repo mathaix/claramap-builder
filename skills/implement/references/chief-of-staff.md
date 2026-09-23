@@ -39,6 +39,9 @@ enforced by the existing helpers. Record actual identities as they become availa
 | --- | --- | --- | --- | --- | --- | --- |
 | T1 / R1 | coder / native or Codex | actual IDs; unavailable if not exposed | input and resulting revision/tree; scope | pending, accepted, findings, blocked | commands, outcomes, log paths | available transcript/events/artifacts; missing capture |
 
+Before dispatch, record each task's model, effort, route, task-specific selection reason,
+authorizing policy entry, and evidence for any Codex bypass. Link the brief containing
+the full decision; see [model routing](model-routing.md#explain-the-choice-before-dispatch).
 Link briefs, output reports, review records, and resumed/replacement agent IDs. Record
 failed dispatches and reassignment reasons. Native agents count as delegation even when
 there is no Codex task directory. A process exit or worker's completion claim is not an

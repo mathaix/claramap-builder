@@ -102,6 +102,11 @@ recordkeeping and authorized orchestration commands from direct code investigati
 product edits, and test execution. Empty Codex worker records do not exclude native
 subagents; an independent reviewer does not prove coding was delegated.
 
+For each model choice or change, check the before-dispatch explanation against the
+actual model and policy role. A generic "judgment tier" does not explain bypassing
+Codex; look for the review policy or concrete fallback evidence. Record absent rationale
+as missing, without assuming native-agent convenience or inventing a cause.
+
 For each direct-work exception, check whether the chief explained it before acting,
 recorded supporting evidence and alternatives, limited its scope, and preserved
 checks and independent review. A small diff or presumed speed is not by itself a
