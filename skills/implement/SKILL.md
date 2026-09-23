@@ -12,6 +12,20 @@ spec authorship, edits, tests, and integration repairs—even for small changes.
 [chief-of-staff boundaries](references/chief-of-staff.md) before execution; direct product
 work requires a recorded exception. The bundled helpers do not enforce this separation.
 
+## Dispatch contract
+
+For ordinary planning, coding, testing, QA, diagnosis, and integration, use the
+allowlisted Codex model through `codex_task.sh` (or an interface that actually dispatches
+that same model). Native Claude Opus is the independent reviewer; Claude Sonnet is the
+configured local-capability fallback. "Delegate to a subagent" does not mean choosing
+any native Claude agent. Apply this contract on new dispatches and reassignments.
+
+On load or reload, reconcile any conflicting plugin defaults or saved preferences with
+the current user request and model policy before dispatch. Cite the conflicting source
+and scope; do not silently treat an old generic routing preference as a current override.
+Honor an explicit current user override and higher-priority restrictions. If the intended
+route is genuinely unresolved or blocked, disclose that rather than silently using Opus.
+
 ## Establish the outcome
 
 Read the request, repository instructions, Git status, and existing intent/run summaries

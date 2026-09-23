@@ -143,6 +143,16 @@ task selection and capability handoffs.
 
 An independently supplied review capability is necessary to complete this workflow. This collection does not bundle private review plugins, configure paid remote reviewers, or promise that a different host can dispatch Claude agents. Repository-required review integrations remain the repository's responsibility.
 
+### Existing plugins and saved preferences
+
+On skill reload, reconcile older plugin routing defaults and saved model preferences
+with the current task's model policy. A generic preference for native Claude subagents
+can otherwise keep a coordinator from using Codex even after these files are updated.
+The chief must identify the conflict and apply the current authorized direction before
+its next dispatch. Installing Claramap does not remove or rewrite other plugins.
+A historical Codex capability failure only justifies fallback for the operation and
+environment it actually covers; it does not disable Codex for all future work.
+
 ## Update
 
 From your collection checkout:

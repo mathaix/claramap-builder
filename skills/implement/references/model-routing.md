@@ -73,6 +73,22 @@ After two failed repair attempts, reassess before another dispatch:
 - Repeated reasoning failure: narrow the task, raise effort, or move to Terra or Sol.
 Already on the strongest worker: reassess scope, evidence, and approach. Do not cycle models.
 
+## Conflicting routing instructions and historical failures
+
+On a fresh run or skill reload, check whether a plugin default or saved preference
+conflicts with the selected route. Record the source, scope, and applicable current
+user instruction in the routing decision. A plugin's description of an older owner
+preference is not itself a fresh user instruction to override this task's model policy.
+Do not change global plugin settings or expand the allowlist to resolve the conflict.
+Follow a clear current user direction; if no authorized route is clear, report the
+conflict before dispatch. Actual tool denials and higher-priority rules still apply.
+
+A past Codex capability failure is evidence about that operation and environment, not
+a blanket reason to send future coding, planning, or QA to Claude. A fallback needs
+an applicable documented limitation or a confirmed failure for the required capability.
+Reuse still-valid evidence without repeating a denied command; name its scope and why
+it applies now. Keep remaining Codex-capable work on the ordinary worker route.
+
 ## Local capability fallback
 
 On the first confirmed sandbox restriction that blocks required local execution (process
