@@ -1,9 +1,11 @@
 # Independent review
 
-Review the integrated change against `specs/<slug>/requirements.md`, independently of
-its implementer. Do not edit product source, stage, commit, or touch external environments.
+Review the integrated change against `specs/<slug>/requirements.md` when present,
+or the original request/brief acceptance criteria for a spec-free task, independently
+of its implementer. Do not edit product source, stage, commit, or touch external environments.
 
-Inputs: exported review copy, the specs, repository rules, `snapshot.json`, the full diff
+Inputs: exported review copy, specs or request/brief criteria, the execution ledger,
+repository rules, `snapshot.json`, the full diff
 from its pinned base, existing check evidence, and prior findings. Verify source
 provenance and inspect affected callers beyond the diff; for merges, inspect both parents.
 A new concern warrants targeted investigation, not a new workflow tier.
@@ -15,8 +17,9 @@ integration evidence stays pending; fake-client tests do not establish real sche
 role behavior.
 
 Findings need a concrete trigger, impact, location, and smallest required fix. Separate
-defects from preferences. P0/P1 block approval; lower findings may be fixed or deferred by
-the coordinator with recorded rationale. Do not force speculative scope.
+defects from preferences. P0/P1 block approval. The chief assigns fixes to a worker
+and may defer lower findings with recorded rationale in the specs or execution ledger.
+Direct coordinator fixes require the same recorded exception as other product edits. Do not force speculative scope.
 
 For a revision, inspect the changed content, prior findings, and affected interactions;
 carry prior coverage forward, but a new tree needs an explicit verdict. Never relabel

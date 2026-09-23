@@ -16,8 +16,10 @@ unresolved uncertainty. Tests that mirror the implementation or re-prove unchang
 behavior add little. Assign each check to one executor by access and independence; do
 not run each check once per role.
 
-Record each check next to its task in `tasks.md` or in `recovery.json`: the command,
-working directory, exit status, and log path. A passing check is reusable while the code,
+Record each check under its task in the run's `execution.md`: command, checked revision
+or tree, working directory, exit status, and log path. Link the evidence from `tasks.md`
+when specs exist; `recovery.json` is an observed state snapshot, not a substitute for
+the execution ledger. A passing check is reusable while the code,
 dependencies, and environment it exercised are unchanged; rerun after any of those change,
 after a failure or interruption, or for a new concrete concern, and say why. A green unit
 test does not prove UI behavior or real database constraints; an old deployment check is

@@ -9,7 +9,7 @@ FILES = ('requirements.md', 'design.md', 'tasks.md')
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('worktree', type=Path)
-    parser.add_argument('slug', help='feature folder name, also the run slug under ~/.claude/implement')
+    parser.add_argument('slug', help='feature folder name; use a matching slug in your separately chosen run directory')
     parser.add_argument('--title', default='Untitled feature')
     args = parser.parse_args()
     if len(Path(args.slug).parts) != 1 or args.slug in ('.', '..'):

@@ -317,6 +317,20 @@ Existing project specifications remain authoritative inputs.
 SpecFlow is used as the planning method within the skill. There is no separate
 SpecFlow executable, imported package, or service to install for these helpers.
 
+## Usage-report coverage
+
+`usage.py --run <run-dir>` reports available recorded usage and writes `usage.md`.
+It detects the Claude coordinator transcript only when the session environment variable
+and expected project path match. Pass `--session <transcript.jsonl>` if detection fails;
+that transcript's available subagent files are included. Missing records are coverage
+gaps, not zero usage. Read the report's Sources and warnings before quoting totals.
+
+Claude totals cover the full supplied session, which can contain multiple development
+goals. Codex totals use recorded session-counter deltas attributed to each attempt's
+model; first observations may include prior session usage, and counter resets or missing
+attempt usage limit attribution. Reports describe observed tokens, not exact per-goal
+cost or verified billing.
+
 ## Agent Skill packaging and harness support
 
 [Agent Skills](https://agentskills.io/home) packages instructions and supporting

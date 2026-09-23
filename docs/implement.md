@@ -113,7 +113,9 @@ serialized and report anything that could not be exercised.
 
 The result is done when every requirement's proof passes, required checks pass, and independent
 review approves the final integrated content. Claude reports delivered behavior, evidence,
-and remaining limitations. Ask [improve-workflow](improve-workflow.md) to analyze the run later.
+and remaining limitations. Usage reports cover available recorded sessions; check
+[coverage limits](architecture.md#usage-report-coverage) before treating them as run totals.
+Ask [improve-workflow](improve-workflow.md) to analyze the run later.
 
 For tool commands, see [execution](../skills/implement/references/execution.md),
 [delegation](../skills/implement/references/delegation.md), and

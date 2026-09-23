@@ -9,19 +9,63 @@ from pathlib import Path
 COLUMNS = ('input', 'cache_read', 'cache_write', 'output')
 
 
-def codex(run):
-    """Counters are session-cumulative, so the last attempt per session holds its total."""
-    last = {}
-    for path in sorted(run.rglob('attempt-*.json'), key=lambda p: (str(p.parent), int(p.stem.split('-')[-1]))):
+def codex(run, warnings=None):
+    """Attribute cumulative-counter deltas to attempts, retaining unknown intervals."""
+    if warnings is None:
+        warnings = []
+    keys = ('input_tokens', 'cached_input_tokens', 'output_tokens')
+    previous = {}
+    gaps = set()
+    directory_gaps = set()
+    paths = sorted(run.rglob('attempt-*.json'),
+                   key=lambda p: (str(p.parent), int(p.stem.split('-')[-1])))
+    records = {(p.parent, int(p.stem.split('-')[-1])) for p in paths}
+    unfinished = [p for p in sorted(run.rglob('events-*.jsonl'))
+                  if (p.parent, int(p.stem.split('-')[-1])) not in records]
+    last_attempt = {}
+    rows = []
+    for path in paths:
+        number = int(path.stem.split('-')[-1])
+        if any(p.parent == path.parent and last_attempt.get(path.parent, 0)
+               < int(p.stem.split('-')[-1]) < number for p in unfinished):
+            directory_gaps.add(path.parent)
+        last_attempt[path.parent] = number
         record = json.loads(path.read_text())
         usage = record.get('usage')
-        if usage and record.get('session_id'):
-            # Codex reports cached tokens inside input_tokens; split them out.
-            last[record['session_id']] = (record['model'], {
-                'input': usage['input_tokens'] - usage['cached_input_tokens'],
-                'cache_read': usage['cached_input_tokens'], 'cache_write': 0,
-                'output': usage['output_tokens']})
-    return last.values()
+        sid = record.get('session_id')
+        valid = (isinstance(usage, dict)
+                 and all(type(usage.get(k)) is int and usage[k] >= 0 for k in keys)
+                 and usage['cached_input_tokens'] <= usage['input_tokens'])
+        if not sid or not valid:
+            warnings.append(f'{path}: missing session identity or valid usage; attempt usage unknown.')
+            if sid:
+                gaps.add(sid)
+            else:
+                directory_gaps.add(path.parent)
+            continue
+        baseline = previous.get(sid, dict.fromkeys(keys, 0))
+        delta = {k: usage[k] - baseline[k] for k in keys}
+        previous[sid] = {k: usage[k] for k in keys}
+        if any(v < 0 for v in delta.values()) or delta['cached_input_tokens'] > delta['input_tokens']:
+            warnings.append(f'{path}: cumulative counters reset or became inconsistent; '
+                            'interval omitted, using this observation as the next baseline.')
+            gaps.discard(sid)
+            directory_gaps.discard(path.parent)
+            continue
+        model = record.get('model')
+        if sid in gaps or path.parent in directory_gaps or not model:
+            model = 'unattributed Codex usage'
+            warnings.append(f'{path}: interval spans missing usage/identity or model; '
+                            'its known cumulative delta cannot be assigned to a model.')
+        gaps.discard(sid)
+        directory_gaps.discard(path.parent)
+        rows.append((model, {
+            'input': delta['input_tokens'] - delta['cached_input_tokens'],
+            'cache_read': delta['cached_input_tokens'], 'cache_write': 0,
+            'output': delta['output_tokens']}))
+    for path in unfinished:
+        warnings.append(f'{path}: no final attempt record; usage unknown.')
+    return rows
 
 
 def claude(transcript):
@@ -63,14 +107,24 @@ def main():
     if not (args.run or args.session):
         parser.error('give --run and/or --session (no current Claude session detected)')
     totals = collections.defaultdict(lambda: dict.fromkeys(COLUMNS, 0))
-    rows = list(codex(args.run) if args.run else []) + list(claude(args.session) if args.session else [])
+    warnings = []
+    if args.run and not args.session:
+        warnings.append('No Claude session detected or supplied; coordinator and Claude subagent '
+                        'usage is not included. Pass --session <transcript.jsonl> for that coverage.')
+    rows = list(codex(args.run, warnings) if args.run else []) + list(claude(args.session) if args.session else [])
     for model, usage in rows:
         for key in COLUMNS:
             totals[model][key] += usage[key]
     lines = ['| model | ' + ' | '.join(COLUMNS) + ' |', '| --- | ' + ' | '.join('---:' for _ in COLUMNS) + ' |']
     lines += [f'| {model} | ' + ' | '.join(f'{usage[c]:,}' for c in COLUMNS) + ' |' for model, usage in sorted(totals.items())]
     lines += ['', f'Sources: run={args.run or "none"}; session={args.session or "none"}.',
+              'Coverage: recorded session usage, not exact per-goal accounting. Claude includes the '
+              'full supplied/detected session and available subagent transcripts. The first Codex '
+              'counter may include earlier session work and is attributed to its recorded model.',
+              'Sessions may span multiple goals; missing records and uncaptured agents are not zero usage.',
               'Tokens only; cost needs verified rates and billing mode.']
+    if warnings:
+        lines += ['', 'Coverage warnings:', '', *('- ' + warning for warning in warnings)]
     report = '\n'.join(lines) + '\n'
     print(report, end='')
     if args.run:

@@ -63,6 +63,7 @@ The coder confirms the R1 regression fails on the baseline, implements the fix, 
 
 ```sh
 mkdir -p "$run_dir/checks"
+set -o pipefail  # Bash or zsh: preserve the test runner's failure through tee.
 python3 -m unittest tests.test_titles -v 2>&1 | tee "$run_dir/checks/test_titles.log"
 ```
 
@@ -116,6 +117,7 @@ and include its actual table in the final response.
 > empty titles. Both regression cases pass and independent review approved the final
 > tree. Implementation and tests were delegated to the coder; a separate reviewer
 > approved the result. No direct-work exceptions. Evidence: `<run-dir>/execution.md`.
-> The change and its spec are committed locally; deployment was outside this request.
+> The change and its spec are reviewed and ready to commit; publication is a separate
+> authorized action.
 >
 > [Include the actual usage table here.]

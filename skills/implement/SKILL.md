@@ -103,8 +103,12 @@ Refresh `recovery.json` at transitions with
 a monitor. Read [recovery](references/recovery.md) before resuming: a stopped conversation
 does not mean its worker stopped. Send a useful update within 60 seconds during long work.
 After the final review passes, run `python3 <skill>/scripts/usage.py --run <run-dir>`.
-It detects the current Claude session, sums tokens per model across Codex workers, the
-coordinator, and subagents, prints the table, and saves it as `<run-dir>/usage.md`.
+It reports available recorded tokens per model and saves `<run-dir>/usage.md`. Claude
+session detection depends on `CLAUDE_CODE_SESSION_ID` and the current project path;
+if unavailable, pass `--session <coordinator-transcript.jsonl>` to include that session
+and its available subagent transcripts. Check the Sources and warnings, and disclose
+missing coverage. Claude totals cover the full supplied session, which may span goals;
+they are not automatically isolated to this run.
 Include that table in the final response, report which work was delegated, and disclose
 any direct-work exception with its reason and evidence path. Summarize the models used
 and material routing changes with their reasons. Tokens are not dollars.
@@ -117,7 +121,7 @@ and material routing changes with their reasons. Tokens are not dollars.
 | Start/resume workers, inspect usage | `codex_task.sh run` / `resume` / `cost`; [delegation](references/delegation.md) |
 | Snapshot, export, verify a review | `review_gate.py`, `review_copy.py`; [execution](references/execution.md) |
 | Observe workers and Git | `run_state.py`; [recovery](references/recovery.md) |
-| Tokens per model across workers, coordinator, and subagents | `scripts/usage.py --run <run-dir>` (session auto-detected) |
+| Available recorded tokens per model | `scripts/usage.py --run <run-dir> [--session <transcript.jsonl>]`; check source coverage |
 | See a complete small run | [Example](references/example-run.md) |
 | Capture conversations | [SpecStory](references/specstory.md) |
 
